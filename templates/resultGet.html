@@ -2,21 +2,23 @@
 <html lang="jp">
 <head>
     <meta charset="UTF-8">
-    <title>Get Result</title>
+    <title>Recieved Message</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css";; rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <p1>PostFrom：{{postFrom}}</p1>
-    <p>Messages You Got</p>
+    <p>Messages</p>
+    <hr>
     {% for message in MessageContents %}
         <tr>
-            <p>{{message[0]}}</p>
+            <p>{{message[1]}} : {{message[3]}}</p>
         </tr>
     {% endfor %}
     <hr>
     <ul>
         <li><a href="/message/home">Message Center</a></li>
+        <li><a href="/logout">Logout</a></li>
     </ul>
  </body>
 </html>
