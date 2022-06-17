@@ -1,16 +1,9 @@
-from pickle import FALSE, TRUE
-from flask import Flask, Request
-from flask import url_for
+from flask import Flask
 from flask import redirect
 from flask import render_template
 import flask
-from flask_login import login_required,LoginManager,UserMixin
-from matplotlib.pyplot import get
 import mysql.connector
-from numpy import true_divide
-from requests import request
-import os
-from werkzeug.security import generate_password_hash
+
 
 dns = {'user': 'mysql','host': 'localhost','password': '1','database': 'kaggle'}
 connector_toDB = mysql.connector.connect(**dns)
