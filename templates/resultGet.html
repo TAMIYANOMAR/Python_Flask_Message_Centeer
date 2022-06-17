@@ -16,6 +16,15 @@
         </tr>
     {% endfor %}
     <hr>
+    <form action="/message/post" method="post">
+        <p1>Post Form</p1>
+        <p>Post to</p>
+        <input type="text" name="postTo" size="30" value={{postFrom}}></p>
+        <p>Message</p>
+        <input type="text" name="content" size="60"></p>
+        <button type="submit" formmethod="POST">Send</button>
+    </form>
+    <hr>
     <ul>
         <li><a href="/message/home">Message Center</a></li>
         <li><a href="/logout">Logout</a></li>

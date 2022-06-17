@@ -3,6 +3,7 @@ from flask import redirect
 from flask import render_template
 import flask
 import mysql.connector
+from zmq import Message
 
 
 dns = {'user': 'mysql','host': 'localhost','password': '1','database': 'kaggle'}
@@ -31,17 +32,27 @@ def LogoutFromUser(ipadress):
 def CheckSignin(username,password,ipadress):
     try:
         stmt = 'SELECT passWord FROM users WHERE name = %s'
-        cur = connector_toDB.cursor()
         param = (username,)
-        cur.execute(stmt,param)
-        truePass = cur.fetchall()
-        cur.close()
+        truePass = Select_from_DB(stmt,param)
         if password == truePass[0][0]:
             Login_users.setdefault(ipadress,username)
             return True
         return False
     except:
         return False
+
+def Insert_to_DB(stmt):
+    cur = connector_toDB.cursor(buffered=True)
+    cur.execute(stmt)
+    connector_toDB.commit()
+    cur.close()
+
+def Select_from_DB(stmt,param):
+    cur = connector_toDB.cursor()
+    cur.execute(stmt,param)
+    messages = cur.fetchall()
+    cur.close()
+    return messages
 
 @app.route('/',methods =['GET','POST'])
 def main():
@@ -51,7 +62,6 @@ def main():
     if flask.request.method == 'POST':
         username = flask.request.form['username']
         password = flask.request.form['password']
-        print(username + " and " + password + "has detected")
         if CheckSignin(username,password,flask.request.remote_addr) == True:
             return redirect('/message/home')
         props = {'title': 'Index', 'msg': 'Username or PassWord wrong'}
@@ -63,10 +73,7 @@ def signup():
         username = flask.request.form['username']
         password = flask.request.form['password']
         stmt = 'INSERT INTO users (name,passWord) VALUE ("{}","{}")'.format(username,password)
-        cur = connector_toDB.cursor(buffered=True)
-        cur.execute(stmt)
-        connector_toDB.commit()
-        cur.close()
+        Insert_to_DB(stmt)
         return redirect('/')
     if flask.request.method == "GET":
         return render_template('signup.html',props = "sign up")
@@ -94,10 +101,7 @@ def reciece_msg():
     content = flask.request.form["content"]
     postTo = flask.request.form["postTo"]
     stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(username,postTo,content)
-    cur = connector_toDB.cursor(buffered=True)
-    cur.execute(stmt)
-    connector_toDB.commit()
-    cur.close()
+    Insert_to_DB(stmt)
     return render_template('resultSend.html', postTo = postTo,messageContent = content)
 
 @app.route("/message/get", methods=["POST"])
@@ -107,11 +111,8 @@ def get_msg():
     username = GetUserNameFromIp(flask.request.remote_addr)
     postFrom = flask.request.form["postFrom"]
     stmt = 'SELECT * FROM messages WHERE (postFrom = %s AND postTo = %s) OR (postFrom = %s AND postTo = %s)'
-    cur = connector_toDB.cursor()
     param = (postFrom,username,username,postFrom)
-    cur.execute(stmt,param)
-    Messages = cur.fetchall()
-    cur.close()
+    Messages = Select_from_DB(stmt,param)
     return render_template('resultGet.html', postFrom = postFrom,MessageContents = Messages)
 
 
