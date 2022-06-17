@@ -80,7 +80,7 @@ def logout():
 @app.route('/message/home', methods = ["GET"])
 def msghome():
     if CheckLogin(flask.request.remote_addr) == False:
-        redirect('/')
+        return redirect('/')
     username = GetUserNameFromIp(flask.request.remote_addr)
     props = {'title': 'message center', 'msg': 'Message Center'}
     return render_template('msghome.html', props=props ,username = username)
@@ -103,7 +103,7 @@ def reciece_msg():
 @app.route("/message/get", methods=["POST"])
 def get_msg():
     if CheckLogin(flask.request.remote_addr) == False:
-        redirect('/')
+        return redirect('/')
     username = GetUserNameFromIp(flask.request.remote_addr)
     postFrom = flask.request.form["postFrom"]
     stmt = 'SELECT * FROM messages WHERE (postFrom = %s AND postTo = %s) OR (postFrom = %s AND postTo = %s)'
