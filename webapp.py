@@ -89,10 +89,13 @@ def msghome():
     if CheckLogin(flask.request.remote_addr) == False:
         return redirect('/')
     username = GetUserNameFromIp(flask.request.remote_addr)
+    stmt = 'SELECT DISTINCT postFrom FROM messages WHERE postTo = %s'
+    param = (username,)
+    fromMessages = Select_from_DB(stmt,param)
     props = {'title': 'message center', 'msg': 'Message Center'}
-    return render_template('msghome.html', props=props ,username = username)
+    return render_template('msghome.html', props=props ,username = username,fromMessages = fromMessages)
 
-
+#not using now#######################################################################################
 @app.route("/message/post", methods=["POST"])
 def reciece_msg():
     if CheckLogin(flask.request.remote_addr) == False:
@@ -103,13 +106,22 @@ def reciece_msg():
     stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(username,postTo,content)
     Insert_to_DB(stmt)
     return render_template('resultSend.html', postTo = postTo,messageContent = content)
+########################################################################################################
+
 
 @app.route("/message/get", methods=["POST"])
 def get_msg():
     if CheckLogin(flask.request.remote_addr) == False:
         return redirect('/')
     username = GetUserNameFromIp(flask.request.remote_addr)
-    postFrom = flask.request.form["postFrom"]
+    try:
+        content = flask.request.form["content"]
+        postTo = flask.request.form["postTo"]
+        postFrom = postTo
+        stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(username,postTo,content)
+        Insert_to_DB(stmt)
+    except:
+        postFrom = flask.request.form["postFrom"]
     stmt = 'SELECT * FROM messages WHERE (postFrom = %s AND postTo = %s) OR (postFrom = %s AND postTo = %s)'
     param = (postFrom,username,username,postFrom)
     Messages = Select_from_DB(stmt,param)

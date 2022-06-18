@@ -11,8 +11,8 @@
             <p2>HELLO_{{username}}</p2>
         </div>
         <hr>
-            <form action="/message/post" method="post">
-                    <p1>Post Form</p1>
+            <form action="/message/get" method="post">
+                    <p1>Post</p1>
                     <p>Post to</p>
                     <input type="text" name="postTo" size="30" ></p>
                     <p>Message</p>
@@ -21,11 +21,21 @@
             </form>
             <hr>
             <form action="/message/get" method="post">
-                <p1>Search Form</p1>
+                <p1>Search</p1>
                 <p>Sender name</p>
                 <input type="text" name="postFrom" size="30" ></p>
                 <button type="submit" formmethod="POST">Search</button>
             </form>
+            <hr>
+                <p>Users</p>
+                {% for fromMessage in fromMessages %}
+                <tr>
+                    <form action="/message/get" method="post">
+                        <input type="hidden" name="postFrom" size="60" value={{fromMessage[0]}}></p>
+                        <button type="submit" formmethod="POST">{{fromMessage[0]}}</button>
+                    </form>
+                </tr>
+                {% endfor %}
             <hr>
         <ul>
             <li><a href="/logout">Logout</a></li>
