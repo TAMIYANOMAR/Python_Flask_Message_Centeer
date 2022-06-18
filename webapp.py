@@ -3,8 +3,7 @@ from flask import redirect
 from flask import render_template
 import flask
 import mysql.connector
-from zmq import Message
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 dns = {'user': 'mysql','host': 'localhost','password': '1','database': 'kaggle'}
 connector_toDB = mysql.connector.connect(**dns)
@@ -12,7 +11,10 @@ connector_toDB.ping(reconnect=True)
 
 app = Flask(__name__)
 
-Login_users = {"exampleip01ip":"example01user"}
+Login_users = {"exampleip":"exampleuser"}
+
+def hash_pass(password):
+    return generate_password_hash(password)
 
 def CheckLogin(ipadress):
     if ipadress in Login_users.keys():
@@ -34,7 +36,7 @@ def CheckSignin(username,password,ipadress):
         stmt = 'SELECT passWord FROM users WHERE name = %s'
         param = (username,)
         truePass = Select_from_DB(stmt,param)
-        if password == truePass[0][0]:
+        if check_password_hash(truePass[0][0], password):
             Login_users.setdefault(ipadress,username)
             return True
         return False
@@ -54,6 +56,7 @@ def Select_from_DB(stmt,param):
     cur.close()
     return messages
 
+
 @app.route('/',methods =['GET','POST'])
 def main():
     if flask.request.method == "GET":
@@ -72,6 +75,7 @@ def signup():
     if flask.request.method == "POST":
         username = flask.request.form['username']
         password = flask.request.form['password']
+        password = hash_pass(password)
         stmt = 'SELECT EXISTS(SELECT * FROM users WHERE name = %s)'
         param = (username,)
         if Select_from_DB(stmt,param)[0][0]==1:
