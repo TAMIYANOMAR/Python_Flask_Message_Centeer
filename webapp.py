@@ -72,11 +72,15 @@ def signup():
     if flask.request.method == "POST":
         username = flask.request.form['username']
         password = flask.request.form['password']
+        stmt = 'SELECT EXISTS(SELECT * FROM users WHERE name = %s)'
+        param = (username,)
+        if Select_from_DB(stmt,param)[0][0]==1:
+            return render_template('signup.html',props = "Username already exists")
         stmt = 'INSERT INTO users (name,passWord) VALUE ("{}","{}")'.format(username,password)
         Insert_to_DB(stmt)
         return redirect('/')
     if flask.request.method == "GET":
-        return render_template('signup.html',props = "sign up")
+        return render_template('signup.html',props = "Signup")
 
 @app.route('/logout',methods = ["GET"])
 def logout():
