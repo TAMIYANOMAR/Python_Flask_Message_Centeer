@@ -60,7 +60,7 @@ def Select_from_DB(stmt,param):
 @app.route('/',methods =['GET','POST'])
 def main():
     if flask.request.method == "GET":
-        props = {'title': 'Index', 'msg': 'Welcome to Message Center'}
+        props = {'title': 'Index', 'msg': 'Message Center'}
         return render_template('index.html', props=props)
     if flask.request.method == 'POST':
         username = flask.request.form['username']

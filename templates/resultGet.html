@@ -10,7 +10,7 @@
     <div id="contents">
         <p2>Messages</p2>
     </div>
-    <p1>PostFrom：{{postFrom}}</p1>
+    <p1>Message With：{{postFrom}}</p1>
     <p>Messages</p>
     <hr>
     {% for message in MessageContents %}
@@ -20,7 +20,7 @@
     {% endfor %}
     <hr>
     <form action="/message/get" method="post">
-        <p1>Post Form</p1>
+        <p1>Message Form</p1>
         <p>Post to</p>
         <input type="text" name="postTo" size="30" value={{postFrom}}></p>
         <p>Message</p>
