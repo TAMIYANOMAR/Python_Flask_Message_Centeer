@@ -10,5 +10,6 @@ CREATE TABLE messages (
   postFrom VARCHAR(255) NOT NULL,
   postTo VARCHAR(255) NOT NULL,
   content VARCHAR(255) NOT NULL,
+  time DATETIME NOT NULL,
   index(id)
 )ENGINE=InnoDB DEFAULT charset=utf8;

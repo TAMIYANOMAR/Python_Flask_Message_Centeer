@@ -8,10 +8,10 @@
 </head>
 <body>
     <div id="contents">
-        <p2>Messages</p2>
+        <p2>メッセージ</p2>
     </div>
-    <p1>Message With：{{postFrom}}</p1>
-    <p>Messages</p>
+    <p1>友達：{{postFrom}}</p1>
+    <p>内容</p>
     <hr>
     {% for message in MessageContents %}
         <tr>
@@ -20,17 +20,17 @@
     {% endfor %}
     <hr>
     <form action="/message/get" method="post">
-        <p1>Message Form</p1>
-        <p>Post to</p>
+        <p1>送信</p1>
+        <p>名前</p>
         <input type="text" name="postTo" size="30" value={{postFrom}}></p>
-        <p>Message</p>
+        <p>メッセージ</p>
         <input type="text" name="content" size="60"></p>
-        <button type="submit" formmethod="POST">Send</button>
+        <button type="submit" formmethod="POST">送信</button>
     </form>
     <hr>
     <ul>
-        <li><a href="/message/home">Message Center</a></li>
-        <li><a href="/logout">Logout</a></li>
+        <li><a href="/message/home">メッセージセンター</a></li>
+        <li><a href="/logout">ログアウト</a></li>
     </ul>
  </body>
 </html>

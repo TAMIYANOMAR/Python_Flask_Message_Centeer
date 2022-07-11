@@ -1,140 +1,80 @@
-from flask import Flask
-from flask import redirect
-from flask import render_template
 import flask
-import mysql.connector
+import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import DBconntctor
+import functions
+import requests
 
-dns = {'user': 'mysql','host': 'localhost','password': '1','database': 'kaggle'}
-connector_toDB = mysql.connector.connect(**dns)
-connector_toDB.ping(reconnect=True)
-
-app = Flask(__name__)
+app = flask.Flask(__name__)
 
 Login_users = {"exampleip":"exampleuser"}
 
-def hash_pass(password):
-    return generate_password_hash(password)
-
-def CheckLogin(ipadress):
-    if ipadress in Login_users.keys():
-        return True
-    return False
-
-def GetUserNameFromIp(ipaderess):
-    return Login_users[ipaderess]
-
-def LogoutFromUser(ipadress):
-    try:
-        Login_users.pop(ipadress)
-    except:
-        return
-    return
-
-def CheckSignin(username,password,ipadress):
-    try:
-        stmt = 'SELECT passWord FROM users WHERE name = %s'
-        param = (username,)
-        truePass = Select_from_DB(stmt,param)
-        if check_password_hash(truePass[0][0], password):
-            Login_users.setdefault(ipadress,username)
-            return True
-        return False
-    except:
-        return False
-
-def Insert_to_DB(stmt):
-    cur = connector_toDB.cursor(buffered=True)
-    cur.execute(stmt)
-    connector_toDB.commit()
-    cur.close()
-
-def Select_from_DB(stmt,param):
-    cur = connector_toDB.cursor()
-    cur.execute(stmt,param)
-    messages = cur.fetchall()
-    cur.close()
-    return messages
 
 
 @app.route('/',methods =['GET','POST'])
 def main():
     if flask.request.method == "GET":
-        props = {'title': 'Index', 'msg': 'Message Center'}
-        return render_template('index.html', props=props)
+        props = {'title': 'Index', 'msg': 'メッセージセンター'}
+        return flask.render_template('index.html', props=props)
     if flask.request.method == 'POST':
         username = flask.request.form['username']
         password = flask.request.form['password']
-        if CheckSignin(username,password,flask.request.remote_addr) == True:
-            return redirect('/message/home')
-        props = {'title': 'Index', 'msg': 'Username or PassWord wrong'}
-        return render_template('index.html', props=props)
+        if functions.CheckSignin(username,password,flask.request.remote_addr) == True:
+            return flask.redirect('/message/home')
+        props = {'title': 'Index', 'msg': '名前かパスワードが間違っています'}
+        return flask.render_template('index.html', props=props)
 
 @app.route('/signup', methods=["POST","GET"])
 def signup():
     if flask.request.method == "POST":
         username = flask.request.form['username']
         password = flask.request.form['password']
-        password = hash_pass(password)
+        password = functions.hash_pass(password)
         stmt = 'SELECT EXISTS(SELECT * FROM users WHERE name = %s)'
         param = (username,)
-        if Select_from_DB(stmt,param)[0][0]==1:
-            return render_template('signup.html',props = "Username already exists")
+        if DBconntctor.Select_from_DB(stmt,param)[0][0]==1:
+            return flask.render_template('signup.html',props = "Username already exists")
         stmt = 'INSERT INTO users (name,passWord) VALUE ("{}","{}")'.format(username,password)
-        Insert_to_DB(stmt)
-        return redirect('/')
+        DBconntctor.Insert_to_DB(stmt)
+        return flask.redirect('/')
     if flask.request.method == "GET":
-        return render_template('signup.html',props = "Signup")
+        return flask.render_template('signup.html',props = "アカウント登録")
 
 @app.route('/logout',methods = ["GET"])
 def logout():
     userip = flask.request.remote_addr
-    LogoutFromUser(userip)
-    return redirect('/')
+    functions.LogoutFromUser(userip)
+    return flask.redirect('/')
 
 @app.route('/message/home', methods = ["GET"])
 def msghome():
-    if CheckLogin(flask.request.remote_addr) == False:
-        return redirect('/')
-    username = GetUserNameFromIp(flask.request.remote_addr)
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
     stmt = 'SELECT DISTINCT postFrom FROM messages WHERE postTo = %s'
     param = (username,)
-    fromMessages = Select_from_DB(stmt,param)
-    props = {'title': 'message center', 'msg': 'Message Center'}
-    return render_template('msghome.html', props=props ,username = username,fromMessages = fromMessages)
-
-#not using now#######################################################################################
-@app.route("/message/post", methods=["POST"])
-def reciece_msg():
-    if CheckLogin(flask.request.remote_addr) == False:
-        return redirect('/')
-    username = GetUserNameFromIp(flask.request.remote_addr)
-    content = flask.request.form["content"]
-    postTo = flask.request.form["postTo"]
-    stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(username,postTo,content)
-    Insert_to_DB(stmt)
-    return render_template('resultSend.html', postTo = postTo,messageContent = content)
-########################################################################################################
-
+    fromMessages = DBconntctor.Select_from_DB(stmt,param)
+    props = {'title': 'メッセージセンター', 'msg': 'メッセージセンター'}
+    return flask.render_template('msghome.html', props=props ,username = username,fromMessages = fromMessages)
 
 @app.route("/message/get", methods=["POST"])
 def get_msg():
-    if CheckLogin(flask.request.remote_addr) == False:
-        return redirect('/')
-    username = GetUserNameFromIp(flask.request.remote_addr)
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
     try:
         content = flask.request.form["content"]
         postTo = flask.request.form["postTo"]
         postFrom = postTo
         stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(username,postTo,content)
-        Insert_to_DB(stmt)
+        DBconntctor.Insert_to_DB(stmt)
     except:
         postFrom = flask.request.form["postFrom"]
     stmt = 'SELECT * FROM messages WHERE (postFrom = %s AND postTo = %s) OR (postFrom = %s AND postTo = %s)'
     param = (postFrom,username,username,postFrom)
-    Messages = Select_from_DB(stmt,param)
-    return render_template('resultGet.html', postFrom = postFrom,MessageContents = Messages)
+    Messages = DBconntctor.Select_from_DB(stmt,param)
+    return flask.render_template('resultGet.html', postFrom = postFrom,MessageContents = Messages)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host='192.168.1.50',port = 5000)
