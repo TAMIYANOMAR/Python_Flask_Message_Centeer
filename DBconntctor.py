@@ -1,6 +1,6 @@
 import mysql.connector
 
-dns = {'user': 'mysql','host': 'localhost','password': '1','database': 'kaggle'}
+dns = {'user': 'root','port':'33306','host': 'localhost','password': 'mysql_pass','database': 'kaggle'}
 connector_toDB = mysql.connector.connect(**dns)
 connector_toDB.ping(reconnect=True)
 

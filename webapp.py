@@ -1,9 +1,7 @@
 import flask
-import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
 import DBconntctor
 import functions
-import requests
+
 
 app = flask.Flask(__name__)
 
@@ -77,4 +75,4 @@ def get_msg():
 
 
 if __name__ == '__main__':
-    app.run(debug=True,host='192.168.1.50',port = 5000)
+    app.run(debug=True,host='192.168.1.50',port = 8000)
