@@ -75,4 +75,8 @@ def get_msg():
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     app.run(debug=True,host='192.168.1.50',port = 8000)
+=======
+    app.run(debug=True,host='',port = 5000)
+>>>>>>> 62f92d6f048297efeffab3b0d17cf38117d0a79d
