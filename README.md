@@ -4,7 +4,8 @@ Please install Flask and Mysql, mysql-connector
 ログイン機能：個人パスワードとIDを用いてユーザ登録、ログインができます。
 メッセージ機能：特定の個人とメッセージのやり取りができます。過去のメッセージはSQLに残り、メッセージ一覧として確認できます。
 
-Dockerコマンドから実行できる
+#Dockerコマンドから実行できる
+```
 #シェル上で実行
 Docker pull mysql
 docker network create python-network
@@ -35,3 +36,4 @@ CREATE TABLE messages (
 docker network inspect python-network
 docker pull tamiyanomar/message-center-py:tagname
 docker run --network python-network -p 5000:5000 -v ${PWD}:/app -d message-center-py
+```
