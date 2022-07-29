@@ -1,7 +1,7 @@
 # message_centeer
 - This is web application with python Flask and mysql.
 - Please install Flask and mysql-connector
-- With Mysql on Docker easily use this application
+- With Mysql on Docker can easily use this application
 - ログイン機能：個人パスワードとIDを用いてユーザ登録、ログインができます。
 - メッセージ機能：特定の個人とメッセージのやり取りができます。過去のメッセージはSQLに残り、メッセージ一覧として確認できます。
 
