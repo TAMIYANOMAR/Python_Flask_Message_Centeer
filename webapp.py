@@ -67,7 +67,7 @@ def get_msg():
         stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(username,postTo,content)
         DBconntctor.Insert_to_DB(stmt)
     except:
-        postFrom = flask.request.form["postFrom"]
+        postFrom = flask.request.form["postTo"]
     stmt = 'SELECT * FROM messages WHERE (postFrom = %s AND postTo = %s) OR (postFrom = %s AND postTo = %s)'
     param = (postFrom,username,username,postFrom)
     Messages = DBconntctor.Select_from_DB(stmt,param)
@@ -75,8 +75,4 @@ def get_msg():
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-    app.run(debug=True,host='192.168.1.50',port = 8000)
-=======
-    app.run(debug=True,host='',port = 5000)
->>>>>>> 62f92d6f048297efeffab3b0d17cf38117d0a79d
+    app.run(debug=True,host='0.0.0.0',port = 5000)
