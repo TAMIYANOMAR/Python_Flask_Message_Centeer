@@ -36,5 +36,5 @@ CREATE TABLE messages (
 #シェルに戻る
 docker network inspect python-network
 docker pull tamiyanomar/message-center-py:tagname
-docker run --network python-network -p 5000:5000 -v ${PWD}:/app -d message-center-py
+docker run --network python-network -p 5000:5000 -v ${PWD}:/app -d tamiyanomar/message-center-py:tagname
 ```
