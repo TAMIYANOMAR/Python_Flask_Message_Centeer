@@ -16,7 +16,7 @@ docker run --name mysql_con  --network python-network  -e MYSQL_ROOT_PASSWORD=my
 - Mysqlコンテナに入る
 ```
 mysql -u root -p
-mysql_pass
+#パスワードはmysql_pass
 CREATE DAABASE kaggle;
 USE kaggle;
 CREATE TABLE users (
