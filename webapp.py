@@ -73,6 +73,72 @@ def get_msg():
     Messages = DBconntctor.Select_from_DB(stmt,param)
     return flask.render_template('resultGet.html', postFrom = postFrom,MessageContents = Messages)
 
+@app.route("/group",methods = ["GET","POST"])
+def group_home():
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
+    if flask.request.method == "GET":
+        stmt = 'SELECT * FROM users_groups WHERE userId = %s'
+        param = (username,)
+        Groups = DBconntctor.Select_from_DB(stmt,param)
+        return flask.render_template('group.html',username = username,props = "グループ作成", fromGroups = Groups)
+
+@app.route("/group/create",methods = ["POST"])
+def create_group():
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
+    groupname = flask.request.form["groupname"]
+    print(groupname)
+    stmt = 'Insert INTO group_rooms (name,owner) VALUE ("{}","{}")'.format(groupname,username)
+    DBconntctor.Insert_to_DB(stmt)
+    stmt = 'SELECT id FROM group_rooms WHERE name = %s AND owner = %s LIMIT 1'
+    param = (groupname,username)
+    group = DBconntctor.Select_from_DB(stmt,param)
+    groupid = group[0][0]
+    print(groupid)
+    stmt = 'INSERT INTO users_groups (group_name,userID,groupID) VALUE ("{}","{}","{}")'.format(groupname,username,groupid)
+    DBconntctor.Insert_to_DB(stmt)
+    return flask.redirect('/group')
+
+@app.route("/group/show",methods = ["get"])
+def show_group():
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
+    groupid = flask.request.args.get("groupid")
+    groupname = flask.request.args.get("groupname")
+    stmt = 'SELECT * FROM groups_massages WHERE groupId = %s'
+    param = (groupid,)
+    messages = DBconntctor.Select_from_DB(stmt,param)
+    return flask.render_template('group_show.html',props = "グループ作成", groupname = groupname,groupid = groupid,MessageContents = messages)
+
+@app.route("/group/send",methods = ["POST"])
+def send_group():
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
+    groupid = flask.request.form["groupid"]
+    groupname = flask.request.form["groupname"]
+    content = flask.request.form["content"]
+    stmt = 'INSERT INTO groups_massages (groupID,content) VALUE ("{}","{}")'.format(groupid,content)
+    DBconntctor.Insert_to_DB(stmt)
+    return flask.redirect('/group/show?groupid={}&groupname={}'.format(groupid,groupname))
+
+@app.route("/group/adduser",methods = ["POST"])
+def add_user_to_group():
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
+    groupid = flask.request.form["groupid"]
+    groupname = flask.request.form["groupname"]
+    userid = flask.request.form["added_username"]
+    stmt = 'INSERT INTO users_groups (group_name,userID,groupID) VALUE ("{}","{}","{}")'.format(groupname,userid,groupid)
+    DBconntctor.Insert_to_DB(stmt)
+    return flask.redirect('/group/show?groupid={}&groupname={}'.format(groupid,groupname))
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0',port = 5000)
+
+    

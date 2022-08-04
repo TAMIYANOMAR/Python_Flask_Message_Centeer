@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+    <meta charset="UTF-8">
+    <title>グループ</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css";; rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="contents">
+        <p2>メッセージ</p2>
+    </div>
+    <p1>グループ名：{{groupname}}</p1>
+    <p>内容</p>
+    <hr>
+    {% for message in MessageContents %}
+        <tr>
+            <p>{{message[4]}} : {{message[2]}}</p>
+        </tr>
+        <hr>
+    {% endfor %}
+    <hr>
+    <form action="/group/send" method="post">
+        <p1>メッセージ送信</p1>
+        <p>グループ</p>
+        <input type="text" name="groupname" size="30" value={{groupname}}></p>
+        <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
+        <p>メッセージ</p>
+        <input type="text" name="content" size="60"></p>
+        <button type="submit" formmethod="POST">送信</button>
+    </form>
+    <hr>
+    <form action="/group/adduser" method="post">
+        <p1>メンバー追加</p1>
+        <p>グループ</p>
+        <input type="text" name="groupname" size="30" value={{groupname}}></p>
+        <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
+        <p>ユーザ名</p>
+        <input type="text" name="added_username" size="60"></p>
+        <button type="submit" formmethod="POST">送信</button>
+    </form>
+    <hr>
+    <ul>
+        <li><a href="/message/home">メッセージセンター</a></li>
+        <li><a href="/logout">ログアウト</a></li>
+    </ul>
+ </body>
+</html>

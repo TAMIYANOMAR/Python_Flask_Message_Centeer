@@ -13,3 +13,26 @@ CREATE TABLE messages (
   time DATETIME DEFAULT CURRENT_TIMESTAMP,
   index(id)
 )ENGINE=InnoDB DEFAULT charset=utf8;
+
+CREATE TABLE group_rooms (
+  id INT UNSIGNED AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  owner VARCHAR(255) NOT NULL,
+  index(id)
+)ENGINE=InnoDB DEFAULT charset=utf8;
+
+CREATE TABLE users_groups (
+  id INT UNSIGNED AUTO_INCREMENT,
+  group_name VARCHAR(255) NOT NULL,
+  userId VARCHAR(255) NOT NULL,
+  groupId INT UNSIGNED NOT NULL,
+  index(id)
+)ENGINE=InnoDB DEFAULT charset=utf8;
+
+CREATE TABLE groups_massages (
+  id INT UNSIGNED AUTO_INCREMENT,
+  groupId INT UNSIGNED NOT NULL,
+  content VARCHAR(255) NOT NULL,
+  time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  index(id)
+)ENGINE=InnoDB DEFAULT charset=utf8;

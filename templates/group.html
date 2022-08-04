@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{props.title}}</title>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css";; rel="stylesheet">
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+    <body>
+        <div id="contents">
+            <p2>こんにちは_{{username}}</p2>
+        </div>
+        <hr>
+            <p1>グループ作成</p1>
+                <form action="/group/create" method="post">
+                        <p>名前</p>
+                        <input type="text" name="groupname" size="30" ></p>
+                        <button type="submit" formmethod="POST">送信</button>
+                </form>
+        <hr>
+            <p1>グループ一覧</p1>
+                {% for fromGroup in fromGroups %}
+                <tr>
+                    <form action="/group/show" method="get">
+                        <input type="hidden" name="groupid" size="60" value={{fromGroup[3]}}></p>
+                        <input type="hidden" name="groupname" size="60" value={{fromGroup[1]}}></p>
+                        <button type="submit" formmethod="get">{{fromGroup[1]}}</button>
+                        
+                    </form>
+                </tr>
+                {% endfor %}
+        <hr>
+        <ul>
+            <li><a href="/group">グループ</a></li>
+            <li><a href="/logout">ログアウト</a></li>
+        </ul>
+    </body>
+</html>
