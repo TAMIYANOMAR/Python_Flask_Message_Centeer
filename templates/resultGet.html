@@ -2,7 +2,7 @@
 <html lang="jp">
 <head>
     <meta charset="UTF-8">
-    <title>Recieved Message</title>
+    <title>受信メッセージ</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css";; rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
@@ -15,9 +15,12 @@
     <hr>
     {% for message in MessageContents %}
         <tr>
-            <p>{{message[1]}} : {{message[3]}}</p>
+            {% if message[1] ==  username %}
+            <p3>{{message[3]}} : ({{message[1]}}) </p>
+            {% else %}
+            <p>({{message[1]}}) : {{message[3]}}</p>
+            {% endif %}
         </tr>
-        <hr>
     {% endfor %}
     <hr>
     <form action="/message/get" method="post">
@@ -26,7 +29,7 @@
         <input type="text" name="postTo" size="30" value={{postFrom}}></p>
         <p>メッセージ</p>
         <input type="text" name="content" size="60"></p>
-        <button type="submit" formmethod="POST">送信</button>
+        <button class="btn-flat-border" type="submit" formmethod="POST">送信</button>
     </form>
     <hr>
     <ul>

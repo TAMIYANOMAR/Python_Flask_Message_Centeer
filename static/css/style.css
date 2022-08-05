@@ -1,7 +1,14 @@
 @import url('https://fonts.googleapis.com/css?family=M+PLUS+1p');
+
 body
 {
-  background-color:rgba(167, 226, 226, 0.603);
+  background-color:rgba(223, 236, 236, 0.781);
+}
+p3
+{
+  font-family: 'M PLUS 1p', sans-serif;
+  color: #165c3f;
+  margin-left: 65px;
 }
 p1 
 { 
@@ -58,4 +65,19 @@ ul
 .box11 p {
   margin: 0; 
   padding: 0;
+}
+
+.btn-flat-border {
+  display: inline-block;
+  padding: 0.3em 1em;
+  text-decoration: none;
+  color: #67c5ff;
+  border: solid 2px #67c5ff;
+  border-radius: 3px;
+  transition: .4s;
+}
+
+.btn-flat-border:hover {
+  background: #67c5ff;
+  color: white;
 }

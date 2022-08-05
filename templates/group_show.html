@@ -11,13 +11,24 @@
         <p2>メッセージ</p2>
     </div>
     <p1>グループ名：{{groupname}}</p1>
-    <p>内容</p>
     <hr>
+    <p>内容</p>
     {% for message in MessageContents %}
         <tr>
-            <p>{{message[4]}} : {{message[2]}}</p>
+            {% if message[3] ==  username %}
+            <p3>{{message[2]}} : ({{message[3]}}) </p>
+            {% else %}
+            <p>({{message[3]}}) : {{message[2]}}</p>
+            {% endif %}
+            
         </tr>
-        <hr>
+    {% endfor %}
+    <hr>
+    <p>メンバー</p>
+    {% for user in users %}
+        <tr>
+            <button type ="submit" class="btn-flat-border">{{user[2]}}</button>
+        </tr>
     {% endfor %}
     <hr>
     <form action="/group/send" method="post">
@@ -27,7 +38,7 @@
         <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
         <p>メッセージ</p>
         <input type="text" name="content" size="60"></p>
-        <button type="submit" formmethod="POST">送信</button>
+        <button type="submit" class="btn-flat-border" formmethod="POST">送信</button>
     </form>
     <hr>
     <form action="/group/adduser" method="post">
@@ -37,7 +48,7 @@
         <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
         <p>ユーザ名</p>
         <input type="text" name="added_username" size="60"></p>
-        <button type="submit" formmethod="POST">送信</button>
+        <button type="submit" class="btn-flat-border" formmethod="POST">送信</button>
     </form>
     <hr>
     <ul>

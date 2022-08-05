@@ -33,6 +33,7 @@ CREATE TABLE groups_massages (
   id INT UNSIGNED AUTO_INCREMENT,
   groupId INT UNSIGNED NOT NULL,
   content VARCHAR(255) NOT NULL,
+  sendername VARCHAR(255) NOT NULL,
   time DATETIME DEFAULT CURRENT_TIMESTAMP,
   index(id)
 )ENGINE=InnoDB DEFAULT charset=utf8;

@@ -55,23 +55,28 @@ def msghome():
     props = {'title': 'メッセージセンター', 'msg': 'メッセージセンター'}
     return flask.render_template('msghome.html', props=props ,username = username,fromMessages = fromMessages)
 
-@app.route("/message/get", methods=["POST"])
+@app.route("/message/get", methods=["POST","GET"])
 def get_msg():
     if functions.CheckLogin(flask.request.remote_addr) == False:
         return flask.redirect('/')
     username = functions.GetUserNameFromIp(flask.request.remote_addr)
-    try:
+    if flask.request.method == "POST":
         content = flask.request.form["content"]
         postTo = flask.request.form["postTo"]
         postFrom = postTo
         stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(username,postTo,content)
         DBconntctor.Insert_to_DB(stmt)
-    except:
-        postFrom = flask.request.form["postTo"]
-    stmt = 'SELECT * FROM messages WHERE (postFrom = %s AND postTo = %s) OR (postFrom = %s AND postTo = %s)'
-    param = (postFrom,username,username,postFrom)
-    Messages = DBconntctor.Select_from_DB(stmt,param)
-    return flask.render_template('resultGet.html', postFrom = postFrom,MessageContents = Messages)
+        stmt = 'SELECT * FROM messages WHERE (postFrom = %s AND postTo = %s) OR (postFrom = %s AND postTo = %s)'
+        param = (postFrom,username,username,postFrom)
+        Messages = DBconntctor.Select_from_DB(stmt,param)
+        return flask.redirect('/message/get?postFrom={}&MessageContents={}&username={}'.format(postFrom,Messages,username))
+    else:
+        postTo = flask.request.args.get("postFrom")
+        postFrom = postTo
+        stmt = 'SELECT * FROM messages WHERE (postFrom = %s AND postTo = %s) OR (postFrom = %s AND postTo = %s)'
+        param = (postFrom,username,username,postFrom)
+        Messages = DBconntctor.Select_from_DB(stmt,param)
+        return flask.render_template('resultGet.html', postFrom = postFrom,MessageContents = Messages,username = username)
 
 @app.route("/group",methods = ["GET","POST"])
 def group_home():
@@ -112,7 +117,10 @@ def show_group():
     stmt = 'SELECT * FROM groups_massages WHERE groupId = %s'
     param = (groupid,)
     messages = DBconntctor.Select_from_DB(stmt,param)
-    return flask.render_template('group_show.html',props = "グループ作成", groupname = groupname,groupid = groupid,MessageContents = messages)
+    stmt = 'SELECT * FROM users_groups WHERE groupID = %s'
+    param = (groupid,)
+    users = DBconntctor.Select_from_DB(stmt,param)
+    return flask.render_template('group_show.html',props = "グループ作成", groupname = groupname,users = users,groupid = groupid,MessageContents = messages, username = username)
 
 @app.route("/group/send",methods = ["POST"])
 def send_group():
@@ -122,7 +130,8 @@ def send_group():
     groupid = flask.request.form["groupid"]
     groupname = flask.request.form["groupname"]
     content = flask.request.form["content"]
-    stmt = 'INSERT INTO groups_massages (groupID,content) VALUE ("{}","{}")'.format(groupid,content)
+    sendername = username
+    stmt = 'INSERT INTO groups_massages (groupID,content,sendername) VALUE ("{}","{}","{}")'.format(groupid,content,sendername)
     DBconntctor.Insert_to_DB(stmt)
     return flask.redirect('/group/show?groupid={}&groupname={}'.format(groupid,groupname))
 
