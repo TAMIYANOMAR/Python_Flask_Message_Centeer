@@ -26,9 +26,10 @@
     <hr>
     <p>メンバー</p>
     {% for user in users %}
-        <tr>
-            <button type ="submit" class="btn-flat-border">{{user[2]}}</button>
-        </tr>
+        <form action="/userinfo/show" method="get">
+            <input type="hidden" name="infoname" value="{{user[2]}}">
+            <button type ="submit" class="btn-flat-border" formmethod="get">{{user[2]}}</button>
+        </form>
     {% endfor %}
     <hr>
     <form action="/group/send" method="post">

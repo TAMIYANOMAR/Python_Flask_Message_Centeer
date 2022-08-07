@@ -30,14 +30,15 @@
                 <p>友達</p>
                 {% for fromMessage in fromMessages %}
                 <tr>
-                    <form action="/message/get" method="GET">
-                        <input type="hidden" name="postFrom" size="60" value={{fromMessage[0]}}></p>
-                        <button class="btn-flat-border" type="submit" formmethod="GET">{{fromMessage[0]}}</button>
+                    <form action="/userinfo/show" method="get">
+                        <input type="hidden" name="infoname" value="{{fromMessage[0]}}">
+                        <button type ="submit" class="btn-flat-border" formmethod="get">{{fromMessage[0]}}</button>
                     </form>
                 </tr>
                 {% endfor %}
             <hr>
         <ul>
+            <li><a href="/userinfo/edit">プロフィール編集</a></li>
             <li><a href="/group">グループ</a></li>
             <li><a href="/logout">ログアウト</a></li>
         </ul>

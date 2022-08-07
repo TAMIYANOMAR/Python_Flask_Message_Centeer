@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{props.title}}</title>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css";; rel="stylesheet">
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+    <body>
+        <hr>
+    <form action="/userinfo/edit" method="post">
+        <p1>プロフィール編集</p1>
+        <p>ひとこと</p>
+        <input type="text" name="comment" size="60" value="{{userinfo[0][2]}}"></p>
+        <p>誕生日</p>
+        <input type="date" name="birthday" size="60" value="{{userinfo[0][3]}}"></p>
+        <p>twitter</p>
+        <input type="text" name="twitter" size="60" value="{{userinfo[0][4]}}"></p>
+        <p>ホームページ</p>
+        <input type="url" name="website" size="60" value="{{userinfo[0][5]}}"></p>
+        <button class="btn-flat-border" type="submit" formmethod="POST">送信</button>
+    </form>
+    <hr>
+    <ul>
+        <li><a href="/message/home">メッセージセンター</a></li>
+        <li><a href="/logout">ログアウト</a></li>
+    </ul>
+    </body>
+</html>

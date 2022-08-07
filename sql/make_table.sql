@@ -37,3 +37,13 @@ CREATE TABLE groups_massages (
   time DATETIME DEFAULT CURRENT_TIMESTAMP,
   index(id)
 )ENGINE=InnoDB DEFAULT charset=utf8;
+
+CREATE TABLE user_info (
+  id INT UNSIGNED AUTO_INCREMENT,
+  userId VARCHAR(255) NOT NULL,
+  comment VARCHAR(255),
+  birthday DATE,
+  twitter VARCHAR(255),
+  website VARCHAR(255),
+  index(id)
+)ENGINE=InnoDB DEFAULT charset=utf8;
