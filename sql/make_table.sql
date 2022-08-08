@@ -47,3 +47,12 @@ CREATE TABLE user_info (
   website VARCHAR(255),
   index(id)
 )ENGINE=InnoDB DEFAULT charset=utf8;
+
+CREATE TABLE user_friends (
+  id INT UNSIGNED AUTO_INCREMENT,
+  requestId VARCHAR(255) NOT NULL,
+  requestedId VARCHAR(255) NOT NULL,
+  requested BOOLEAN DEFAULT false,
+  approved BOOLEAN DEFAULT false,
+  index(id)
+)ENGINE=InnoDB DEFAULT charset=utf8;

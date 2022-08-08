@@ -31,8 +31,19 @@
                 {% for fromMessage in fromMessages %}
                 <tr>
                     <form action="/userinfo/show" method="get">
-                        <input type="hidden" name="infoname" value="{{fromMessage[0]}}">
-                        <button type ="submit" class="btn-flat-border" formmethod="get">{{fromMessage[0]}}</button>
+                        <input type="hidden" name="infoname" value="{{fromMessage[1]}}">
+                        <button type ="submit" class="btn-flat-border" formmethod="get">{{fromMessage[1]}}</button>
+                    </form>
+                </tr>
+                {% endfor %}
+            <hr>
+                <p>友達申請</p>
+                {% for request in friendrequests %}
+                <tr>
+                    <form action="/friend/approve" method="get">
+                        <input type="hidden" name="requestedid" value="{{request[2]}}">
+                        <input type="hidden" name="requestid" value="{{request[1]}}">
+                        <button type ="submit" class="btn-flat-border" formmethod="get">{{request[1]}}</button>
                     </form>
                 </tr>
                 {% endfor %}

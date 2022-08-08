@@ -22,6 +22,12 @@
         <p>ホームページ</p>
         <li>{{userinfo[0][5]}}</p>
         </form>
+        <form action="/friend/request" method="get">
+            <p>ホームページ</p>
+            <input type="hidden" name="requestname" value="{{userinfo[0][1]}}"></p>
+            <input type="hidden" name="isrequest" value="True"></p>
+            <button class="btn-flat-border" type="submit" formmethod="get">フレンドリクエスト</button>
+        </form>
     <hr>
     <ul>
         <li><a href="/message/get?postFrom={{userinfo[0][1]}}">このユーザとのやり取り</a></li>

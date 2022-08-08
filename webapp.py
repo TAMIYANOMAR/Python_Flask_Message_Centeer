@@ -1,3 +1,5 @@
+from pickle import TRUE
+from urllib import request
 import flask
 import DBconntctor
 import functions
@@ -36,6 +38,8 @@ def signup():
             return flask.render_template('signup.html',props = "Username already exists")
         stmt = 'INSERT INTO users (name,passWord) VALUE ("{}","{}")'.format(username,password)
         DBconntctor.Insert_to_DB(stmt)
+        stmt = 'INSERT INTO user_info (userId) VALUE ("{}")'.format(username)
+        DBconntctor.Insert_to_DB(stmt)
         return flask.redirect('/')
     if flask.request.method == "GET":
         return flask.render_template('signup.html',props = "アカウント登録")
@@ -58,12 +62,17 @@ def msghome():
     username = functions.GetUserNameFromIp(flask.request.remote_addr)
     
     #get all friends
-    stmt = 'SELECT DISTINCT postFrom FROM messages WHERE postTo = %s'
+    stmt = 'SELECT * FROM user_friends WHERE requestedId = %s AND approved = "1"'
     param = (username,)
     fromMessages = DBconntctor.Select_from_DB(stmt,param)
 
+    #get friend requests
+    stmt = 'SELECT * FROM user_friends WHERE requestedId = %s AND requested = "1" AND approved = "0"'
+    param = (username,)
+    friendrequests = DBconntctor.Select_from_DB(stmt,param)
+
     props = {'title': 'メッセージセンター', 'msg': 'メッセージセンター'}
-    return flask.render_template('msghome.html', props=props ,username = username,fromMessages = fromMessages)
+    return flask.render_template('msghome.html', props=props ,username = username,fromMessages = fromMessages,friendrequests = friendrequests)
 
 
 @app.route("/message/get", methods=["POST","GET"])
@@ -207,7 +216,7 @@ def edit_user_info():
         if functions.CheckLogin(flask.request.remote_addr) == False:
             return flask.redirect('/')
         username = functions.GetUserNameFromIp(flask.request.remote_addr)
-    
+
         #if method is get
         if flask.request.method == "GET":
             stmt = 'SELECT COUNT(id) FROM user_info WHERE userId = %s'
@@ -252,6 +261,7 @@ def show_user_info():
                 return flask.redirect('/')
             username = functions.GetUserNameFromIp(flask.request.remote_addr)
 
+            
             #表示したいユーザーのユーザーIDを取得
             infoname = flask.request.args.get("infoname")
             stmt = 'SELECT COUNT(id) FROM user_info WHERE userId = %s'
@@ -266,6 +276,44 @@ def show_user_info():
                 return flask.render_template('show_user_info.html',username = username,props = "ユーザープロフィール",userinfo = userinfo)
             else:
                 return flask.render_template('/no_user_info.html')
+
+
+@app.route("/friend/request",methods = ["GET"])
+def friend_request():
+
+    #check if user is logged in
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
+
+    requestname = username
+    requestedname = flask.request.args.get("requestname")
+
+    #insert friend request
+    stmt = 'INSERT INTO user_friends (requestedId,requestId,requested) VALUE ("{}","{}","{}")'.format(requestedname,requestname,1)
+    DBconntctor.Insert_to_DB(stmt)
+    return flask.redirect('/message/home')
+
+
+@app.route("/friend/approve",methods = ["GET"])
+def friend_approve():
+
+    #check if user is logged in
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
+
+    requestedname = username
+    requestname = flask.request.args.get("requestid")
+
+    #insert friend request
+    stmt = 'UPDATE user_friends SET approved = "{}" WHERE requestedId = "{}" AND requestId = "{}"'.format(1,requestedname,requestname)
+    DBconntctor.Insert_to_DB(stmt)
+    stmt = 'INSERT INTO user_friends (requestedId,requestId,approved) VALUE ("{}","{}","{}")'.format(requestname,requestedname,1)
+    DBconntctor.Insert_to_DB(stmt)
+    return flask.redirect('/message/home')
+
+
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0',port = 5000)
