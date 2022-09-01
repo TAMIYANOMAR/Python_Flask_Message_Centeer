@@ -1,13 +1,16 @@
+from concurrent.futures import thread
 from pickle import TRUE
 from urllib import request
 import flask
 import DBconntctor
 import functions
+from waitress import serve
 
 
 app = flask.Flask(__name__)
 
 Login_users = {"exampleip":"exampleuser"}
+
 
 
 ###########show root page##############
@@ -17,8 +20,14 @@ def main():
         props = {'title': 'Index', 'msg': 'メッセージセンター'}
         return flask.render_template('index.html', props=props)
     if flask.request.method == 'POST':
+        #ユーザ名とパスワードを確認
         username = flask.request.form['username']
         password = flask.request.form['password']
+
+        #一旦ログアウト
+        userip = flask.request.remote_addr
+        functions.LogoutFromUser(userip)
+        #ログイン
         if functions.CheckSignin(username,password,flask.request.remote_addr) == True:
             return flask.redirect('/message/home')
         props = {'title': 'Index', 'msg': '名前かパスワードが間違っています'}
@@ -267,13 +276,14 @@ def show_user_info():
             stmt = 'SELECT COUNT(id) FROM user_info WHERE userId = %s'
             param = (infoname,)
             count = DBconntctor.Select_from_DB(stmt,param)
+            friend = functions.check_friend(infoname,username)
             if count[0][0] > 0:
                 #get user info
                 stmt = 'SELECT * FROM user_info WHERE userId = %s'
                 param = (infoname,)
                 userinfo = DBconntctor.Select_from_DB(stmt,param)
                 print(userinfo)
-                return flask.render_template('show_user_info.html',username = username,props = "ユーザープロフィール",userinfo = userinfo)
+                return flask.render_template('show_user_info.html',username = username,props = "ユーザープロフィール",userinfo = userinfo,friend = friend)
             else:
                 return flask.render_template('/no_user_info.html')
 
@@ -313,9 +323,24 @@ def friend_approve():
     DBconntctor.Insert_to_DB(stmt)
     return flask.redirect('/message/home')
 
+@app.route("/friend/reject",methods = ["GET"])
+def friend_reject():
+    
+        #check if user is logged in
+        if functions.CheckLogin(flask.request.remote_addr) == False:
+            return flask.redirect('/')
+        username = functions.GetUserNameFromIp(flask.request.remote_addr)
+    
+        requestedname = username
+        requestname = flask.request.args.get("requestid")
+    
+        #insert friend request
+        stmt = 'UPDATE user_friends SET  requested = "{}" WHERE requestedId = "{}" AND requestId = "{}"'.format(0,requestedname,requestname)
+        DBconntctor.Insert_to_DB(stmt)
+        return flask.redirect('/message/home')
+
 
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0',port = 5000)
-
-    
+    #app.run(debug=True,host='0.0.0.0',port = 5000)
+    serve(app, host='0.0.0.0', port=5000,threads = 10)

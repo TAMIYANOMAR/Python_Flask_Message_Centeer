@@ -23,14 +23,20 @@
         <li>{{userinfo[0][5]}}</p>
         </form>
         <form action="/friend/request" method="get">
-            <p>ホームページ</p>
-            <input type="hidden" name="requestname" value="{{userinfo[0][1]}}"></p>
             <input type="hidden" name="isrequest" value="True"></p>
+            {% if friend == False %}
             <button class="btn-flat-border" type="submit" formmethod="get">フレンドリクエスト</button>
+            {% else %}
+            <p></p>
+            {% endif %}
         </form>
     <hr>
     <ul>
+        {% if friend == True %}
         <li><a href="/message/get?postFrom={{userinfo[0][1]}}">このユーザとのやり取り</a></li>
+        {% else %}
+        <p></p>
+        {% endif %}
         <li><a href="/message/home">メッセージセンター</a></li>
         <li><a href="/logout">ログアウト</a></li>
     </ul>

@@ -39,3 +39,15 @@ def CheckSignin(username,password,ipadress):
         return False
     except:
         return False
+
+def check_friend(requestname,requestedname):
+    stmt = 'SELECT approved FROM user_friends WHERE requestId = %s AND requestedId = %s'
+    param = (requestname,requestedname)
+    result = DBconntctor.Select_from_DB(stmt,param)
+    try:
+        if result[0][0] == 1:
+            return True
+        else:
+            return False
+    except:
+        return False
