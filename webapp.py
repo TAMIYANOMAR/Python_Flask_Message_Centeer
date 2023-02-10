@@ -102,6 +102,10 @@ def get_msg():
         if(functions.check_friend(username,postTo) == False):
             return flask.redirect('/message/home')
 
+        #check if message is empty or space
+        if(content == "" or content.isspace()):
+            return flask.redirect('/message/get?postFrom={}'.format(postFrom))
+        
         #send message to user
         stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(username,postTo,content)
         DBconntctor.Insert_to_DB(stmt)
