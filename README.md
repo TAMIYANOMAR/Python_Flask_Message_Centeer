@@ -7,7 +7,6 @@
 
 #updates
 - 2023/02/10 CSS,HTMLのアップデート フレンド機能の追加
-![image](https://user-images.githubusercontent.com/59043309/218005556-8582c61a-a2e0-4a43-9344-dedeb420314c.png)
 ![image](https://user-images.githubusercontent.com/59043309/218005614-03933c8a-cc0c-4046-8608-7ef8726966e7.png)
 
 
