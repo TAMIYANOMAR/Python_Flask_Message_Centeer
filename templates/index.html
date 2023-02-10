@@ -10,19 +10,22 @@
         
         <div class = "box11">
         <div id="contents">
-            <p2>{{props.msg}}</p2>
-        </div>
-        <form action="/" method="post">
-            <p1>ログイン</p1>
-            <p>名前</p>
-            <input type="text" name="username" size="20" ></p>
-            <p>パスワード</p>
-            <input type="text" name="password" size="20"></p>
-            <button type="submit" formmethod="POST">送信</button>
-        </form>
-        <ul>
-            <li><a href="/signup">アカウント登録</a></li>
-        </ul>
+            <h1>{{props.msg}}</h1>
+        
+            <div class="container">
+                <form class="form" action="/" method="post">
+                    <h2>ログイン</h2>
+                    <p class="name">名前</p>
+                    <input class="input" type="text" name="username" size="20" ></p>
+                    <p class="pass">パスワード</p>
+                    <input class="input" type="text" name="password" size="20"></p>
+                    <input class="btn" type="submit" value="送信" formmethod="POST"></input>
+                </form>
+                
+            </div>
+            <ul>
+                <a href="/signup">アカウント登録はこちらから</a>
+            </ul>
         </div>
         
     </body>

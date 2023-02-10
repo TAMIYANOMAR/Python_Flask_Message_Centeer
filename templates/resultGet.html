@@ -2,39 +2,45 @@
 <html lang="jp">
 <head>
     <meta charset="UTF-8">
-    <title>受信メッセージ</title>
+    <title>メッセージ</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css";; rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div id="contents">
-        <p2>メッセージ</p2>
+    <div class="box11">
+        <h1>{{postFrom}}</h1>
+        <hr>
+        <h2 class="out-of-form">内容</h2>
+        {% for message in MessageContents %}
+                {% if message[2] !=  username %}
+                <div class="msg-container">
+                    <div class="msg-container-to">
+                        <p class="msg-to">{{message[3]}} : ({{message[1]}}) </p>
+                    </div>
+                </div>
+                {% else %}
+                <div class="msg-container">
+                    <div class="msg-container-from">
+                        <p class="msg-from">({{message[1]}}) : {{message[3]}}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+        {% endfor %}
+        <hr>
+        <h2 class="out-of-form">送信</h2>
+            <form class="form" action="/message/get" method="post"> 
+                <p class="name">名前</p>
+                <input class="input" type="text" name="postTo" size="30" value={{postFrom}}></p>
+                <p class="name">メッセージ</p>
+                <input class="input" type="text" name="content" size="60"></p>
+                <button class="btn" type="submit" formmethod="POST">送信</button>
+            </form>
+        <hr>
+        <ul>
+            <li><a href="/message/home">メッセージセンター</a></li>
+            <li><a href="/logout">ログアウト</a></li>
+        </ul>
     </div>
-    <p1>友達：{{postFrom}}</p1>
-    <p>内容</p>
-    <hr>
-    {% for message in MessageContents %}
-        <tr>
-            {% if message[1] ==  username %}
-            <p3>{{message[3]}} : ({{message[1]}}) </p>
-            {% else %}
-            <p>({{message[1]}}) : {{message[3]}}</p>
-            {% endif %}
-        </tr>
-    {% endfor %}
-    <hr>
-    <form action="/message/get" method="post">
-        <p1>送信</p1>
-        <p>名前</p>
-        <input type="text" name="postTo" size="30" value={{postFrom}}></p>
-        <p>メッセージ</p>
-        <input type="text" name="content" size="60"></p>
-        <button class="btn-flat-border" type="submit" formmethod="POST">送信</button>
-    </form>
-    <hr>
-    <ul>
-        <li><a href="/message/home">メッセージセンター</a></li>
-        <li><a href="/logout">ログアウト</a></li>
-    </ul>
  </body>
 </html>

@@ -7,23 +7,25 @@
         <link rel="stylesheet" href="/static/css/style.css">
     </head>
     <body>
-        <hr>
-    <form action="/userinfo/edit" method="post">
-        <p1>プロフィール編集</p1>
-        <p>ひとこと</p>
-        <input type="text" name="comment" size="60" value="{{userinfo[0][2]}}"></p>
-        <p>誕生日</p>
-        <input type="date" name="birthday" size="60" value="{{userinfo[0][3]}}"></p>
-        <p>twitter</p>
-        <input type="text" name="twitter" size="60" value="{{userinfo[0][4]}}"></p>
-        <p>ホームページ</p>
-        <input type="url" name="website" size="60" value="{{userinfo[0][5]}}"></p>
-        <button class="btn-flat-border" type="submit" formmethod="POST">送信</button>
-    </form>
-    <hr>
-    <ul>
-        <li><a href="/message/home">メッセージセンター</a></li>
-        <li><a href="/logout">ログアウト</a></li>
-    </ul>
+        <div class="box11">
+            <h1>プロフィール編集</h1>
+            <hr>
+            <form class="form" action="/userinfo/edit" method="post">
+                <h2>ひとこと</h2>
+                <input class="input" type="text" name="comment" size="60" value="{{userinfo[0][2]}}"></p>
+                <h2>誕生日</h2>
+                <input class="input" type="date" name="birthday" size="60" value="{{userinfo[0][3]}}"></p>
+                <h2>twitter</h2>
+                <input class="input" type="text" name="twitter" size="60" value="{{userinfo[0][4]}}"></p>
+                <h2>ホームページ</h2>
+                <input class="input" type="url" name="website" size="60" value="{{userinfo[0][5]}}"></p>
+                <button class="btn" type="submit" formmethod="POST">送信</button>
+            </form>
+            <hr>
+            <ul>
+                <li><a href="/message/home">メッセージセンターホーム</a></li>
+                <li><a href="/logout">ログアウト</a></li>
+            </ul>
+        </div>
     </body>
 </html>

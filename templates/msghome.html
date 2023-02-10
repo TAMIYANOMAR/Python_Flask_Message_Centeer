@@ -7,51 +7,60 @@
         <link rel="stylesheet" href="/static/css/style.css">
     </head>
     <body>
-        <div id="contents">
-            <p2>こんにちは_{{username}}</p2>
+        <div class="box11"> 
+            <h1>MessagingCenter Home</h1>
+                <hr>
+                <h2 class="out-of-form">送信</h2>
+                <form class="form" action="/message/get" method="post"> 
+                        <p class="name">宛先</p>
+                        <input class="input" type="text" name="postTo" size="30" ></p>
+                        <p class="name">メッセージ</p>
+                        <input class="input" type="text" name="content" size="60"></p>
+                        <button class="btn" type="submit" formmethod="POST">送信</button>
+                </form>
+                <hr>
+                <h2 class="out-of-form">検索</h2>
+                <form class="form" action="/userinfo/show" method="GET">
+
+                    <p class="name">名前</p>
+                    <input class="input" type="text" name="infoname" size="30" ></p>
+                    <button class="btn" type="submit" formmethod="GET">送信</button>
+                </form>
+                <hr>
+                    <h2 class="out-of-form">友達一覧</h2>
+                    {% for fromMessage in fromMessages %}
+                    <tr>
+                        <form class="form" action="/userinfo/show" method="get">
+                            <input type="hidden" name="infoname" value="{{fromMessage[1]}}">
+                            <button type ="submit" class="btn-friend" formmethod="get">{{fromMessage[1]}}</button>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                <hr>
+                    <h2 class="out-of-form">友達申請</h2>
+                    {% for request in friendrequests %}
+                    <tr>
+                        <div class="friend-request-container">
+                            <h2 class="friend-request-h2">{{request[1]}}</h2>
+                            <form class="friend-request-form" action="/friend/approve" method="get">
+                                <input type="hidden" name="requestedid" value="{{request[2]}}">
+                                <input type="hidden" name="requestid" value="{{request[1]}}">
+                                <button type ="submit" class="btn-friend" formmethod="get">承認</button>
+                            </form>
+                            <form class="friend-request-form" action="/friend/reject" method="get">
+                                <input type="hidden" name="requestedid" value="{{request[2]}}">
+                                <input type="hidden" name="requestid" value="{{request[1]}}">
+                                <button type ="submit" class="btn-friend" formmethod="get">却下</button>
+                            </form>
+                        </div>
+                    </tr>
+                    {% endfor %}
+                <hr>
+            <ul>
+                <li><a href="/userinfo/edit">プロフィール編集</a></li>
+                <li><a href="/group">グループ</a></li>
+                <li><a href="/logout">ログアウト</a></li>
+            </ul>
         </div>
-        <hr>
-            <form action="/message/get" method="post">
-                    <p1>送信</p1>
-                    <p>宛先</p>
-                    <input type="text" name="postTo" size="30" ></p>
-                    <p>メッセージ</p>
-                    <input type="text" name="content" size="60"></p>
-                    <button class="btn-flat-border" type="submit" formmethod="POST">送信</button>
-            </form>
-            <hr>
-            <form action="/userinfo/show" method="GET">
-                <p1>検索</p1>
-                <p>名前</p>
-                <input type="text" name="infoname" size="30" ></p>
-                <button class="btn-flat-border" type="submit" formmethod="GET">送信</button>
-            </form>
-            <hr>
-                <p>友達</p>
-                {% for fromMessage in fromMessages %}
-                <tr>
-                    <form action="/userinfo/show" method="get">
-                        <input type="hidden" name="infoname" value="{{fromMessage[1]}}">
-                        <button type ="submit" class="btn-flat-border" formmethod="get">{{fromMessage[1]}}</button>
-                    </form>
-                </tr>
-                {% endfor %}
-            <hr>
-                <p>友達申請</p>
-                {% for request in friendrequests %}
-                <tr>
-                    <form action="/friend/approve" method="get">
-                        <input type="hidden" name="requestedid" value="{{request[2]}}">
-                        <input type="hidden" name="requestid" value="{{request[1]}}">
-                        <button type ="submit" class="btn-flat-border" formmethod="get">{{request[1]}}</button>
-                    </form>
-                </tr>
-                {% endfor %}
-            <hr>
-        <ul>
-            <li><a href="/userinfo/edit">プロフィール編集</a></li>
-            <li><a href="/group">グループ</a></li>
-            <li><a href="/logout">ログアウト</a></li>
-        </ul>
     </body>
 </html>

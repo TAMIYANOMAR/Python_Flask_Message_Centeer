@@ -1,6 +1,7 @@
 import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import DBconntctor
+import time
 
 
 Login_users = {"exampleip":"exampleuser"}
@@ -49,5 +50,16 @@ def check_friend(requestname,requestedname):
             return True
         else:
             return False
+    except:
+        return False
+
+def store_image_to_folder(image,username):
+    try:
+        now_time = time.dateime.now()
+        image.save('static/images/' + username + now_time + '.jpg')
+        stmt = 'UPDATE users SET image = %s WHERE name = %s'
+        param = (username + now_time + '.jpg',username)
+        DBconntctor.Update_DB(stmt,param)
+        return True
     except:
         return False

@@ -7,54 +7,61 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div id="contents">
-        <p2>メッセージ</p2>
-    </div>
-    <p1>グループ名：{{groupname}}</p1>
-    <hr>
-    <p>内容</p>
-    {% for message in MessageContents %}
-        <tr>
-            {% if message[3] ==  username %}
-            <p3>{{message[2]}} : ({{message[3]}}) </p>
-            {% else %}
-            <p>({{message[3]}}) : {{message[2]}}</p>
-            {% endif %}
+    <div class = "box11">
+        <h1>グループ：{{groupname}}</h1>
+        <hr>
+        <h2 class="out-of-form">メッセージ</h2>
+        {% for message in MessageContents %}
+                {% if message[0] ==  username %}
+                <div class="msg-container">
+                    <div class="msg-container-to">
+                        <p class="msg-to">{{message[2]}} : ({{message[0]}}) </p>
+                    </div>
+                </div>
+                {% else %}
+                <div class="msg-container">
+                    <div class="msg-container-from">
+                        <p class="msg-from">({{message[0]}}) : {{message[2]}}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+        {% endfor %}
+        <hr>
+        <h2 class="out-of-form">メンバー</h2>
+        {% for user in users %}
+            <form class="form" action="/userinfo/show" method="get">
+                <input type="hidden" name="infoname" value="{{user[2]}}">
+                <button type ="submit" class="btn-friend" formmethod="get">{{user[2]}}</button>
+            </form>
+        {% endfor %}
+        <hr>
+        <h2 class="out-of-form">メッセージ送信</h2>
+        <form class="form" action="/group/send" method="post">
             
-        </tr>
-    {% endfor %}
-    <hr>
-    <p>メンバー</p>
-    {% for user in users %}
-        <form action="/userinfo/show" method="get">
-            <input type="hidden" name="infoname" value="{{user[2]}}">
-            <button type ="submit" class="btn-flat-border" formmethod="get">{{user[2]}}</button>
+            <p class="name">グループ</p>
+            <input class="input" type="text" name="groupname" size="30" value={{groupname}}></p>
+            <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
+            <p class="name">メッセージ</p>
+            <input class="input" type="text" name="content" size="60"></p>
+            <button type="submit" class="btn" formmethod="POST">送信</button>
         </form>
-    {% endfor %}
-    <hr>
-    <form action="/group/send" method="post">
-        <p1>メッセージ送信</p1>
-        <p>グループ</p>
-        <input type="text" name="groupname" size="30" value={{groupname}}></p>
-        <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
-        <p>メッセージ</p>
-        <input type="text" name="content" size="60"></p>
-        <button type="submit" class="btn-flat-border" formmethod="POST">送信</button>
-    </form>
-    <hr>
-    <form action="/group/adduser" method="post">
-        <p1>メンバー追加</p1>
-        <p>グループ</p>
-        <input type="text" name="groupname" size="30" value={{groupname}}></p>
-        <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
-        <p>ユーザ名</p>
-        <input type="text" name="added_username" size="60"></p>
-        <button type="submit" class="btn-flat-border" formmethod="POST">送信</button>
-    </form>
-    <hr>
-    <ul>
-        <li><a href="/message/home">メッセージセンター</a></li>
-        <li><a href="/logout">ログアウト</a></li>
-    </ul>
+        <hr>
+        <h2 class="out-of-form">メンバー追加</h2>
+        <form class="form" action="/group/adduser" method="post">
+            
+            <p class="name">グループ</p>
+            <input class="input" type="text" name="groupname" size="30" value={{groupname}}></p>
+            <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
+            <p class="name">ユーザ名</p>
+            <input class="input" type="text" name="added_username" size="60"></p>
+            <button class="btn" type="submit" class="btn-flat-border" formmethod="POST">送信</button>
+        </form>
+        <hr>
+        <ul>
+            <li><a href="/message/home">メッセージセンター</a></li>
+            <li><a href="/logout">ログアウト</a></li>
+        </ul>
+    </div>
  </body>
 </html>

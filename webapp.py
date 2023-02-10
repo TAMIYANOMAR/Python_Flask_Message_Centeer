@@ -17,7 +17,7 @@ Login_users = {"exampleip":"exampleuser"}
 @app.route('/',methods =['GET','POST'])
 def main():
     if flask.request.method == "GET":
-        props = {'title': 'Index', 'msg': 'メッセージセンター'}
+        props = {'title': 'Index', 'msg': 'MessagingCenter'}
         return flask.render_template('index.html', props=props)
     if flask.request.method == 'POST':
         #ユーザ名とパスワードを確認
@@ -30,7 +30,7 @@ def main():
         #ログイン
         if functions.CheckSignin(username,password,flask.request.remote_addr) == True:
             return flask.redirect('/message/home')
-        props = {'title': 'Index', 'msg': '名前かパスワードが間違っています'}
+        props = {'title': 'Index', 'msg': '入力間違いです'}
         return flask.render_template('index.html', props=props)
 
 
@@ -74,12 +74,12 @@ def msghome():
     stmt = 'SELECT * FROM user_friends WHERE requestedId = %s AND approved = "1"'
     param = (username,)
     fromMessages = DBconntctor.Select_from_DB(stmt,param)
-
     #get friend requests
     stmt = 'SELECT * FROM user_friends WHERE requestedId = %s AND requested = "1" AND approved = "0"'
     param = (username,)
+    
     friendrequests = DBconntctor.Select_from_DB(stmt,param)
-
+    print(friendrequests)
     props = {'title': 'メッセージセンター', 'msg': 'メッセージセンター'}
     return flask.render_template('msghome.html', props=props ,username = username,fromMessages = fromMessages,friendrequests = friendrequests)
 
@@ -92,11 +92,15 @@ def get_msg():
         return flask.redirect('/')
     username = functions.GetUserNameFromIp(flask.request.remote_addr)
 
+
     #if user is sending message
     if flask.request.method == "POST":
         content = flask.request.form["content"]
         postTo = flask.request.form["postTo"]
         postFrom = postTo
+
+        if(functions.check_friend(username,postTo) == False):
+            return flask.redirect('/message/home')
 
         #send message to user
         stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(username,postTo,content)
@@ -111,6 +115,9 @@ def get_msg():
     else:
         postTo = flask.request.args.get("postFrom")
         postFrom = postTo
+
+        if(functions.check_friend(username,postTo) == False):
+            return flask.redirect('/message/home')
 
         #get messages from user
         stmt = 'SELECT * FROM messages WHERE (postFrom = %s AND postTo = %s) OR (postFrom = %s AND postTo = %s)'
@@ -128,6 +135,7 @@ def group_home():
         return flask.redirect('/')
     username = functions.GetUserNameFromIp(flask.request.remote_addr)
 
+    
     #if method is get
     if flask.request.method == "GET":
         #get all groups
@@ -297,11 +305,20 @@ def friend_request():
     username = functions.GetUserNameFromIp(flask.request.remote_addr)
 
     requestname = username
-    requestedname = flask.request.args.get("requestname")
+    requestedname = flask.request.args.get("requestedname")
 
+    #check if already requested
+    stmt = 'SELECT COUNT(id) FROM user_friends WHERE requestedId = %s AND requestId = %s'
+    params = (requestedname,requestname,)
+    count = DBconntctor.Select_from_DB(stmt,params)
+    if count[0][0] > 0:
+        stmt = 'UPDATE user_friends SET requested = "{}" WHERE requestedId = "{}" AND requestId = "{}"'.format(1,requestedname,requestname)
+        DBconntctor.Insert_to_DB(stmt)
+        return flask.redirect('/message/home')
     #insert friend request
     stmt = 'INSERT INTO user_friends (requestedId,requestId,requested) VALUE ("{}","{}","{}")'.format(requestedname,requestname,1)
     DBconntctor.Insert_to_DB(stmt)
+    print(stmt)
     return flask.redirect('/message/home')
 
 
@@ -342,5 +359,5 @@ def friend_reject():
 
 
 if __name__ == '__main__':
-    #app.run(debug=True,host='0.0.0.0',port = 5000)
-    serve(app, host='0.0.0.0', port=5000,threads = 10)
+    app.run(debug=True,host='0.0.0.0',port = 5000)
+    # serve(app, host='0.0.0.0', port=5000,threads = 10)
