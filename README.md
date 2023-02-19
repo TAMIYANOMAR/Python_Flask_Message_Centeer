@@ -8,7 +8,6 @@
 # Updates
 
 - 2023/02/19 アイコン機能を実装
-![image](https://user-images.githubusercontent.com/59043309/219938909-94bed9d9-ebd2-4ebf-8d04-e1960c17edf9.png)
 ![image](https://user-images.githubusercontent.com/59043309/219938926-767944ac-2dfa-4e75-9ce2-f2d732c2a07b.png)
 
 - 2023/02/10 CSS,HTMLのアップデート フレンド機能を追加
