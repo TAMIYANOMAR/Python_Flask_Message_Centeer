@@ -30,10 +30,13 @@
                     <h2 class="out-of-form">友達一覧</h2>
                     {% for fromMessage in fromMessages %}
                     <tr>
-                        <form class="form" action="/userinfo/show" method="get">
-                            <input type="hidden" name="infoname" value="{{fromMessage[1]}}">
-                            <button type ="submit" class="btn-friend" formmethod="get">{{fromMessage[1]}}</button>
-                        </form>
+                        <div class="friend-show">
+                            <form class="form" action="/userinfo/show" method="get">
+                                <img class="img" src="{{ url_for('static', filename= 'image/' + fromMessage[1] + '.jpg') }}" alt="Uploaded Image">
+                                <input type="hidden" name="infoname" value="{{fromMessage[1]}}">
+                                <button type ="submit" class="btn-friend" formmethod="get">{{fromMessage[1]}}</button>
+                            </form>
+                        </div>
                     </tr>
                     {% endfor %}
                 <hr>

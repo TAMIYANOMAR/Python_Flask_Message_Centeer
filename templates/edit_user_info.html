@@ -10,7 +10,11 @@
         <div class="box11">
             <h1>プロフィール編集</h1>
             <hr>
-            <form class="form" action="/userinfo/edit" method="post">
+            <form class="form" action="/userinfo/edit" method="post" enctype="multipart/form-data">
+                
+                <h2>アイコン</h2>
+                <img src="{{ url_for('static', filename= 'image/' + userinfo[0][1] + '.jpg') }}" alt="Uploaded Image">
+                <input class="input" type="file" name="file" size="60" accept="image/png, image/jpeg" ></p>
                 <h2>ひとこと</h2>
                 <input class="input" type="text" name="comment" size="60" value="{{userinfo[0][2]}}"></p>
                 <h2>誕生日</h2>
@@ -18,7 +22,7 @@
                 <h2>twitter</h2>
                 <input class="input" type="text" name="twitter" size="60" value="{{userinfo[0][4]}}"></p>
                 <h2>ホームページ</h2>
-                <input class="input" type="url" name="website" size="60" value="{{userinfo[0][5]}}"></p>
+                <input class="input" type="text" name="website" size="60" value="{{userinfo[0][5]}}"></p>
                 <button class="btn" type="submit" formmethod="POST">送信</button>
             </form>
             <hr>

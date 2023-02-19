@@ -12,16 +12,16 @@
         <hr>
         <h2 class="out-of-form">メッセージ</h2>
         {% for message in MessageContents %}
-                {% if message[0] ==  username %}
+                {% if message[3] ==  username %}
                 <div class="msg-container">
                     <div class="msg-container-to">
-                        <p class="msg-to">{{message[2]}} : ({{message[0]}}) </p>
+                        <p class="msg-to">{{message[2]}} : ({{message[3]}}) </p>
                     </div>
                 </div>
                 {% else %}
                 <div class="msg-container">
                     <div class="msg-container-from">
-                        <p class="msg-from">({{message[0]}}) : {{message[2]}}</p>
+                        <p class="msg-from">({{message[3]}}) : {{message[2]}}</p>
                     </div>
                 </div>
                 {% endif %}
@@ -30,10 +30,13 @@
         <hr>
         <h2 class="out-of-form">メンバー</h2>
         {% for user in users %}
-            <form class="form" action="/userinfo/show" method="get">
-                <input type="hidden" name="infoname" value="{{user[2]}}">
-                <button type ="submit" class="btn-friend" formmethod="get">{{user[2]}}</button>
-            </form>
+            <div class="friend-show">   
+                <form class="form" action="/userinfo/show" method="get">
+                    <img class="img" src="{{ url_for('static', filename= 'image/' + user[2] + '.jpg') }}" alt="Uploaded Image">
+                    <input type="hidden" name="infoname" value="{{user[2]}}">
+                    <button type ="submit" class="btn-friend" formmethod="get">{{user[2]}}</button>
+                </form>
+            </div>
         {% endfor %}
         <hr>
         <h2 class="out-of-form">メッセージ送信</h2>

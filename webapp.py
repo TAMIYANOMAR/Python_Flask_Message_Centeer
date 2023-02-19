@@ -5,7 +5,7 @@ import flask
 import DBconntctor
 import functions
 from waitress import serve
-
+import os
 
 app = flask.Flask(__name__)
 
@@ -260,17 +260,32 @@ def edit_user_info():
             birthday = flask.request.form["birthday"]
             twitter = flask.request.form["twitter"]
             website = flask.request.form["website"]
+            imgFile = None
+            print(birthday)
+            if "file" in flask.request.files:
+                imgFile = flask.request.files["file"]
+                UPLOAD_FOLDER = 'Python/static/image/'
+                app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+                imgFile.save(os.path.join(app.config['UPLOAD_FOLDER'], username + ".jpg"))
             stmt = 'SELECT COUNT(id) FROM user_info WHERE userId = %s'
             param = (username,)
             count = DBconntctor.Select_from_DB(stmt,param)
             if count[0][0] > 0:
                 #update user info
-                stmt = 'UPDATE user_info SET comment = "{}",birthday = "{}",twitter = "{}",website = "{}" WHERE userId = "{}"'.format(comment,birthday,twitter,website,username)
-                DBconntctor.Insert_to_DB(stmt)
+                if birthday == '':
+                    stmt = 'UPDATE user_info SET comment = "{}",twitter = "{}",website = "{}" WHERE userId = "{}"'.format(comment,twitter,website,username)
+                    DBconntctor.Insert_to_DB(stmt)
+                else:
+                    stmt = 'UPDATE user_info SET comment = "{}",birthday = "{}",twitter = "{}",website = "{}" WHERE userId = "{}"'.format(comment,birthday,twitter,website,username)
+                    DBconntctor.Insert_to_DB(stmt)
             else:
                 #insert user info
-                stmt = 'INSERT INTO user_info (userId,comment,birthday,twitter,website) VALUE ("{}","{}","{}","{}","{}")'.format(username,comment,birthday,twitter,website)
-                DBconntctor.Insert_to_DB(stmt)
+                if birthday == '':
+                    stmt = 'INSERT INTO user_info (userId,comment,twitter,website) VALUE ("{}","{}","{}","{}")'.format(username,comment,twitter,website)
+                    DBconntctor.Insert_to_DB(stmt)
+                else:
+                    stmt = 'INSERT INTO user_info (userId,comment,birthday,twitter,website) VALUE ("{}","{}","{}","{}","{}")'.format(username,comment,birthday,twitter,website)
+                    DBconntctor.Insert_to_DB(stmt)
             return flask.redirect('/userinfo/edit')
 
 

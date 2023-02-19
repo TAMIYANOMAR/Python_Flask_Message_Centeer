@@ -11,6 +11,7 @@
             <h1>プロフィール</h1>
             <hr>
             <div class="container">
+                <img src="{{ url_for('static', filename= 'image/' + userinfo[0][1] + '.jpg') }}" alt="Uploaded Image">
                 <h2>ユーザ名</h2>
                 <li class="profile">{{userinfo[0][1]}}</p>
                 <h2>ひとこと</h2>
