@@ -5,6 +5,31 @@
     <title>メッセージ</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css";; rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = null;
+        $(document).ready(function() {
+            const button = document.getElementById('mybutton');
+            const postFrom = document.getElementById('postFrom');
+            const postTo = document.getElementById('postTo');
+            const message = document.getElementById('message');
+            button.addEventListener('click',function() {
+                socket.emit('send', postFrom.value, postTo.value, message.value);
+            });
+            socket = io();
+            socket.on('connect', function() {
+                socket.emit('join');
+            });
+            socket.on('server response', function() {
+                location.reload();
+            });
+        });
+
+        
+
+        
+    </script>
 </head>
 <body>
     <div class="box11">
@@ -28,13 +53,14 @@
                 
         {% endfor %}
         <hr>
-        <h2 class="out-of-form">送信</h2>
-            <form class="form" action="/message/get" method="post"> 
+        <h2  class="out-of-form">送信</h2>
+            <form id="myForm" class="form" onsubmit="return false"> 
                 <p class="name">名前</p>
-                <input class="input" type="text" name="postTo" size="30" value={{postFrom}}></p>
+                <input id="postTo" class="input" type="text" name="postTo" size="30" value={{postFrom}}></p>
+                <input id="postFrom" class="input" type="hidden" name="postFrom" size="30" value={{username}}></p>
                 <p class="name">メッセージ</p>
-                <input class="input" type="text" name="content" size="60"></p>
-                <button class="btn" type="submit" formmethod="POST">送信</button>
+                <input id="message" class="input"  type="text" name="content" size="60"></p>
+                <button id="mybutton" class="btn">送信</button>
             </form>
         <hr>
         <ul>

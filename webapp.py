@@ -2,16 +2,30 @@ from concurrent.futures import thread
 from pickle import TRUE
 from urllib import request
 import flask
+from flask_socketio import SocketIO, emit, join_room
 import DBconntctor
 import functions
 from waitress import serve
 import os
 
 app = flask.Flask(__name__)
-
+async_mode1 = "threading"
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode1, logger=True, engineio_logger=True)
 Login_users = {"exampleip":"exampleuser"}
 
+@socketio.on('join')
+def handle_join():
+    print("join")
+    join_room(1)
 
+@socketio.on('send')
+def send(postFrom,postTo,content):
+    print("send")
+    print(postFrom,postTo,content)
+    #send message to user
+    stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(postFrom,postTo,content)
+    DBconntctor.Insert_to_DB(stmt)
+    emit('server response', room=1)
 
 ###########show root page##############
 @app.route('/',methods =['GET','POST'])
@@ -115,7 +129,9 @@ def get_msg():
         param = (postFrom,username,username,postFrom)
         Messages = DBconntctor.Select_from_DB(stmt,param)
 
-        return flask.redirect('/message/get?postFrom={}&MessageContents={}&username={}'.format(postFrom,Messages,username))
+
+        #return flask.redirect('/message/get?postFrom={}&MessageContents={}&username={}'.format(postFrom,Messages,username))
+        return flask.render_template('resultGet.html', postFrom = postFrom,MessageContents = Messages,username = username)
     else:
         postTo = flask.request.args.get("postFrom")
         postFrom = postTo
@@ -378,5 +394,6 @@ def friend_reject():
 
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0',port = 5000)
+    # app.run(debug=True,host='0.0.0.0',port = 5000)
+    socketio.run(app,debug=True,host='192.168.0.50',port = 5000)
     # serve(app, host='0.0.0.0', port=5000,threads = 10)
