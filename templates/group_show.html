@@ -5,6 +5,9 @@
     <title>グループ</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css";; rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+    <script type="text/javascript" src="/static/js/group_show.js" ></script>
 </head>
 <body>
     <div class = "box11">
@@ -40,14 +43,14 @@
         {% endfor %}
         <hr>
         <h2 class="out-of-form">メッセージ送信</h2>
-        <form class="form" action="/group/send" method="post">
-            
+        <form class="form" onsubmit="return false">
             <p class="name">グループ</p>
             <input class="input" type="text" name="groupname" size="30" value={{groupname}}></p>
-            <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
+            <input id="username" type="hidden" name="username" size="30" value={{username}}></p>
+            <input id="groupid" type="hidden" name="groupid" size="30" value={{groupid}}></p>
             <p class="name">メッセージ</p>
-            <input class="input" type="text" name="content" size="60"></p>
-            <button type="submit" class="btn" formmethod="POST">送信</button>
+            <input id="content" class="input" type="text" name="content" size="60"></p>
+            <button id="mybutton" type="submit" class="btn" formmethod="POST">送信</button>
         </form>
         <hr>
         <h2 class="out-of-form">メンバー追加</h2>
@@ -55,10 +58,10 @@
             
             <p class="name">グループ</p>
             <input class="input" type="text" name="groupname" size="30" value={{groupname}}></p>
-            <input type="hidden" name="groupid" size="30" value={{groupid}}></p>
+            <input id="groupid" type="hidden" name="groupid" size="30" value={{groupid}}></p>
             <p class="name">ユーザ名</p>
             <input class="input" type="text" name="added_username" size="60"></p>
-            <button class="btn" type="submit" class="btn-flat-border" formmethod="POST">送信</button>
+            <button class="btn" class="btn-flat-border" formmethod="POST">送信</button>
         </form>
         <hr>
         <ul>

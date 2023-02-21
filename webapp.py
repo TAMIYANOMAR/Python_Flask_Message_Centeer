@@ -8,26 +8,64 @@ import functions
 from waitress import serve
 import os
 
+
+rooms = dict()
+room_no = 0
+rooms_group = dict()
+room_no_group = 1000
 app = flask.Flask(__name__)
-async_mode1 = "threading"
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode1, logger=True, engineio_logger=True)
+asyncMode = "threading"
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode=asyncMode, logger=True, engineio_logger=True)
 Login_users = {"exampleip":"exampleuser"}
 
+
+###########socketio##############
 @socketio.on('join')
-def handle_join():
-    print("join")
-    join_room(1)
+def handle_join(postTo,postFrom):
+    print(postTo,postFrom)
+    global room_no
+    global rooms
+    for key in rooms:
+        if (key == postFrom) or (key == postTo):
+            print(rooms[key])
+            join_room(rooms[key])
+            emit('send_room_no',rooms[key])
+            return 
+    room_no = room_no + 1
+    rooms[postFrom] = room_no
+    rooms[postTo] = room_no
+    join_room(room_no)
+    emit('send_room_no',room_no)
+
+@socketio.on('join_room')
+def handle_join_room(group_id):
+    global room_no_group
+    global rooms_group
+    for key in rooms_group:
+        if key == group_id:
+            print(rooms_group[key])
+            join_room(rooms_group[key])
+            emit('send_room_no',rooms_group[key])
+            return
+    room_no_group = room_no_group + 1
+    rooms_group[group_id] = room_no_group
+    join_room(rooms_group[group_id])
+    emit('send_room_no',room_no_group)
 
 @socketio.on('send')
-def send(postFrom,postTo,content):
-    print("send")
-    print(postFrom,postTo,content)
-    #send message to user
+def send(postFrom,postTo,content,roomNo):
     stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(postFrom,postTo,content)
     DBconntctor.Insert_to_DB(stmt)
-    emit('server response', room=1)
+    emit('server response', room=roomNo)
 
-###########show root page##############
+@socketio.on('send_group')
+def sendGroup(sendername,groupid,content,roomNo):
+    stmt = 'INSERT INTO groups_massages (groupID,content,sendername) VALUE ("{}","{}","{}")'.format(groupid,content,sendername)
+    DBconntctor.Insert_to_DB(stmt)
+    emit('server response', room=roomNo)
+###########socketio end##############
+
+###########show signin page##############
 @app.route('/',methods =['GET','POST'])
 def main():
     if flask.request.method == "GET":
@@ -38,7 +76,7 @@ def main():
         username = flask.request.form['username']
         password = flask.request.form['password']
 
-        #一旦ログアウト
+        #現在のユーザから一旦ログアウト
         userip = flask.request.remote_addr
         functions.LogoutFromUser(userip)
         #ログイン
@@ -76,6 +114,7 @@ def logout():
     return flask.redirect('/')
 
 
+###########show user home page##############
 @app.route('/message/home', methods = ["GET"])
 def msghome():
 
@@ -97,7 +136,7 @@ def msghome():
     props = {'title': 'メッセージセンター', 'msg': 'メッセージセンター'}
     return flask.render_template('msghome.html', props=props ,username = username,fromMessages = fromMessages,friendrequests = friendrequests)
 
-
+###########show message page##############
 @app.route("/message/get", methods=["POST","GET"])
 def get_msg():
 
@@ -129,9 +168,8 @@ def get_msg():
         param = (postFrom,username,username,postFrom)
         Messages = DBconntctor.Select_from_DB(stmt,param)
 
-
-        #return flask.redirect('/message/get?postFrom={}&MessageContents={}&username={}'.format(postFrom,Messages,username))
         return flask.render_template('resultGet.html', postFrom = postFrom,MessageContents = Messages,username = username)
+    
     else:
         postTo = flask.request.args.get("postFrom")
         postFrom = postTo
@@ -147,6 +185,7 @@ def get_msg():
         return flask.render_template('resultGet.html', postFrom = postFrom,MessageContents = Messages,username = username)
 
 
+###########show group index page##############
 @app.route("/group",methods = ["GET","POST"])
 def group_home():
 
@@ -166,6 +205,7 @@ def group_home():
         return flask.render_template('group.html',username = username,props = "グループ作成", fromGroups = Groups)
 
 
+###########soute for creating group##############
 @app.route("/group/create",methods = ["POST"])
 def create_group():
 
@@ -188,6 +228,7 @@ def create_group():
     return flask.redirect('/group')
 
 
+###########show group page##############
 @app.route("/group/show",methods = ["get"])
 def show_group():
 
@@ -209,6 +250,7 @@ def show_group():
     return flask.render_template('group_show.html',props = "グループ作成", groupname = groupname,users = users,groupid = groupid,MessageContents = messages, username = username)
 
 
+###########route for sending message to group##############
 @app.route("/group/send",methods = ["POST"])
 def send_group():
 
@@ -228,6 +270,7 @@ def send_group():
     return flask.redirect('/group/show?groupid={}&groupname={}'.format(groupid,groupname))
 
 
+###########route for adding user to group##############
 @app.route("/group/adduser",methods = ["POST"])
 def add_user_to_group():
 
@@ -246,6 +289,7 @@ def add_user_to_group():
     return flask.redirect('/group/show?groupid={}&groupname={}'.format(groupid,groupname))
 
 
+###########show edit user info page##############
 @app.route("/userinfo/edit",methods = ["GET","POST"])
 def edit_user_info():
     
@@ -305,6 +349,7 @@ def edit_user_info():
             return flask.redirect('/userinfo/edit')
 
 
+###########show user info page##############
 @app.route("/userinfo/show",methods = ["GET"])
 def show_user_info():
         
@@ -331,6 +376,7 @@ def show_user_info():
                 return flask.render_template('/no_user_info.html')
 
 
+##########route for friend request##########
 @app.route("/friend/request",methods = ["GET"])
 def friend_request():
 
@@ -357,6 +403,7 @@ def friend_request():
     return flask.redirect('/message/home')
 
 
+##########route for approve friend request##########
 @app.route("/friend/approve",methods = ["GET"])
 def friend_approve():
 
@@ -375,6 +422,7 @@ def friend_approve():
     DBconntctor.Insert_to_DB(stmt)
     return flask.redirect('/message/home')
 
+##########route for reject friend request##########
 @app.route("/friend/reject",methods = ["GET"])
 def friend_reject():
     
@@ -392,8 +440,5 @@ def friend_reject():
         return flask.redirect('/message/home')
 
 
-
 if __name__ == '__main__':
-    # app.run(debug=True,host='0.0.0.0',port = 5000)
     socketio.run(app,debug=True,host='192.168.0.50',port = 5000)
-    # serve(app, host='0.0.0.0', port=5000,threads = 10)

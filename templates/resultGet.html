@@ -7,29 +7,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="//code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
-    <script type="text/javascript" charset="utf-8">
-        var socket = null;
-        $(document).ready(function() {
-            const button = document.getElementById('mybutton');
-            const postFrom = document.getElementById('postFrom');
-            const postTo = document.getElementById('postTo');
-            const message = document.getElementById('message');
-            button.addEventListener('click',function() {
-                socket.emit('send', postFrom.value, postTo.value, message.value);
-            });
-            socket = io();
-            socket.on('connect', function() {
-                socket.emit('join');
-            });
-            socket.on('server response', function() {
-                location.reload();
-            });
-        });
-
-        
-
-        
-    </script>
+    <script type="text/javascript" src="/static/js/resultGet.js" ></script>
 </head>
 <body>
     <div class="box11">
