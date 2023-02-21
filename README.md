@@ -7,7 +7,9 @@
 
 # Updates
 
--2023/02/21 socket通信を用いてメッセージ受信時に自動更新を行います
+- 2023/02/21 socket通信を用いてメッセージ受信時に自動更新を行う機能を追加
+- https://user-images.githubusercontent.com/59043309/220309331-b5537c49-0dc6-4006-b474-28e772fac62b.mp4
+
 
 - 2023/02/19 アイコン機能を実装
 - ![image](https://user-images.githubusercontent.com/59043309/219938926-767944ac-2dfa-4e75-9ce2-f2d732c2a07b.png)
