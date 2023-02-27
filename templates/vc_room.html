@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebRTC Signaling Demo</title>
+    <title>ビデオチャット</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css";; rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="//code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
@@ -32,6 +33,14 @@
                 <p class="vc_room_name">{{connectTo}}</p>
                 <input id="connectTo" type="hidden" class="vc_room_name" value="{{connectTo}}"></input>
             </div>
+        </div>
+        <hr>
+        <div class="link-container">
+            <ul>
+                <li><a href="/message/get?postFrom={{connectTo}}">このユーザとのやり取り</a></li>
+                <li><a href="/message/home">メッセージセンター</a></li>
+                <li><a href="/logout">ログアウト</a></li>
+            </ul>
         </div>
     </div>
 </body>
