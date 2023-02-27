@@ -13,6 +13,8 @@ rooms = dict()
 room_no = 0
 rooms_group = dict()
 room_no_group = 1000
+rooms_for_rtc = dict()
+room_no_rtc = 2000
 app = flask.Flask(__name__)
 asyncMode = "threading"
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode=asyncMode, logger=True, engineio_logger=True)
@@ -62,8 +64,47 @@ def send(postFrom,postTo,content,roomNo):
 def sendGroup(sendername,groupid,content,roomNo):
     stmt = 'INSERT INTO groups_massages (groupID,content,sendername) VALUE ("{}","{}","{}")'.format(groupid,content,sendername)
     DBconntctor.Insert_to_DB(stmt)
-    emit('server response', room=roomNo)
+    emit('server response',room=roomNo)
 ###########socketio end##############
+
+###########voice chat###################
+@app.route('/voiceChat',methods=['GET'])
+def videoChat():
+
+    #check if user is logged in
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
+
+    connectTo = flask.request.args.get('connectTo')
+    return flask.render_template('vc_room.html', connectTo = connectTo, connectFrom = username)
+
+###########socketio signaling###########
+@socketio.on('connect_rtc')
+def handle_rtc_connect(connectFrom,connectTo):
+    global room_no_rtc
+    global rooms_for_rtc
+    if connectFrom not in rooms_for_rtc:
+        room_no_rtc = room_no_rtc + 1
+        rooms_for_rtc[connectFrom] = room_no_rtc
+    if connectTo not in rooms_for_rtc:
+        room_no_rtc = room_no_rtc + 1
+        rooms_for_rtc[connectTo] = room_no_rtc
+    print('connected')
+    join_room(rooms_for_rtc[connectFrom])
+
+@socketio.on('offer')
+def handle_offer(data,connectTo):
+    emit('offer_data', data, room=rooms_for_rtc[connectTo])
+
+@socketio.on('answer')
+def handle_answer(data,connectTo):
+    emit('answer_data', data, room=rooms_for_rtc[connectTo])
+
+@socketio.on('candidate')
+def handle_candidate(data,connectTo):
+    emit('candidate_data', data, room=rooms_for_rtc[connectTo])
+    
 
 ###########show signin page##############
 @app.route('/',methods =['GET','POST'])

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC Signaling Demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script type="text/javascript" src="/static/js/vc_room.js"></script>
+</head>
+<body>
+    
+    <div class="box12">
+        <h1>ビデオチャット</h1>
+        <hr>
+        <div id="videos">
+            <div class="video-container">
+                <video id="local-video" autoplay></video>
+            </div>
+            <div class="video-container">
+                <video id="remote-video" autoplay></video>
+            </div>
+        </div>
+        <div class="video_names">
+            <div class="vc-room-name-container">
+                <p class="vc_room_name" >{{connectFrom}} </p>
+                <input id="connectFrom" type="hidden" class="vc_room_name" value="{{connectFrom}}"></input>
+            </div>
+            <div class="vc-room-name-container">
+                <p class="vc_room_name">{{connectTo}}</p>
+                <input id="connectTo" type="hidden" class="vc_room_name" value="{{connectTo}}"></input>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

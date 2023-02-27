@@ -44,22 +44,17 @@
         <hr>
         <h2 class="out-of-form">メッセージ送信</h2>
         <form class="form" onsubmit="return false">
-            <p class="name">グループ</p>
-            <input class="input" type="text" name="groupname" size="30" value={{groupname}}></p>
+            <input class="input" type="hidden" name="groupname" size="30" value={{groupname}}></p>
             <input id="username" type="hidden" name="username" size="30" value={{username}}></p>
             <input id="groupid" type="hidden" name="groupid" size="30" value={{groupid}}></p>
-            <p class="name">メッセージ</p>
             <input id="content" class="input" type="text" name="content" size="60"></p>
             <button id="mybutton" type="submit" class="btn" formmethod="POST">送信</button>
         </form>
         <hr>
         <h2 class="out-of-form">メンバー追加</h2>
         <form class="form" action="/group/adduser" method="post">
-            
-            <p class="name">グループ</p>
-            <input class="input" type="text" name="groupname" size="30" value={{groupname}}></p>
+            <input class="input" type="hidden" name="groupname" size="30" value={{groupname}}></p>
             <input id="groupid" type="hidden" name="groupid" size="30" value={{groupid}}></p>
-            <p class="name">ユーザ名</p>
             <input class="input" type="text" name="added_username" size="60"></p>
             <button class="btn" class="btn-flat-border" formmethod="POST">送信</button>
         </form>
