@@ -4,8 +4,10 @@
 - With Mysql on Docker can easily use this application
 - ログイン機能：個人パスワードとIDを用いてユーザ登録、ログインができます。
 - メッセージ機能：特定の個人とメッセージのやり取りができます。過去のメッセージはSQLに残り、メッセージ一覧として確認できます。
-
+- Dockerで動かすことができるのはかなり前のものになります。
 # Updates
+
+- 2023/02/27 webRTCを用いた1対1のビデオチャット機能を追加
 
 - 2023/02/21 socket通信を用いてメッセージ受信時に自動更新を行う機能を追加
 - https://user-images.githubusercontent.com/59043309/220309331-b5537c49-0dc6-4006-b474-28e772fac62b.mp4
