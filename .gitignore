@@ -2,3 +2,4 @@ Dockerfile
 DBconnctor.py
 ./static/image
 .jpg
+./certificate
