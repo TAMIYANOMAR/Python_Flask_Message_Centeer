@@ -5,23 +5,30 @@ import flask
 from flask_socketio import SocketIO, emit, join_room
 import DBconntctor
 import functions
-from waitress import serve
 import os
+import ssl
 
-
+#テキストチャットの通知に使うルーム（キーがユーザーネームで値がルーム番号）
 rooms = dict()
+#現在のルーム番号の最大値が格納される
 room_no = 0
+#グループのテキストチャット用
 rooms_group = dict()
 room_no_group = 1000
+#RTC用
 rooms_for_rtc = dict()
 room_no_rtc = 2000
 app = flask.Flask(__name__)
 asyncMode = "threading"
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode=asyncMode, logger=True, engineio_logger=True)
+context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+context.load_cert_chain('Python/certificate/cert.pem','Python/certificate/privkey.pem')
 Login_users = {"exampleip":"exampleuser"}
 
 
 ###########socketio##############
+#section for socketio in text chat
+#messages for 1 on 1
 @socketio.on('join')
 def handle_join(postTo,postFrom):
     print(postTo,postFrom)
@@ -39,6 +46,13 @@ def handle_join(postTo,postFrom):
     join_room(room_no)
     emit('send_room_no',room_no)
 
+@socketio.on('send')
+def send(postFrom,postTo,content,roomNo):
+    stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(postFrom,postTo,content)
+    DBconntctor.Insert_to_DB(stmt)
+    emit('server response', room=roomNo)
+
+#messages for groups
 @socketio.on('join_room')
 def handle_join_room(group_id):
     global room_no_group
@@ -54,12 +68,6 @@ def handle_join_room(group_id):
     join_room(rooms_group[group_id])
     emit('send_room_no',room_no_group)
 
-@socketio.on('send')
-def send(postFrom,postTo,content,roomNo):
-    stmt = 'INSERT INTO messages (postFrom,postTo,content) VALUE ("{}","{}","{}")'.format(postFrom,postTo,content)
-    DBconntctor.Insert_to_DB(stmt)
-    emit('server response', room=roomNo)
-
 @socketio.on('send_group')
 def sendGroup(sendername,groupid,content,roomNo):
     stmt = 'INSERT INTO groups_massages (groupID,content,sendername) VALUE ("{}","{}","{}")'.format(groupid,content,sendername)
@@ -67,19 +75,8 @@ def sendGroup(sendername,groupid,content,roomNo):
     emit('server response',room=roomNo)
 ###########socketio end##############
 
-###########voice chat###################
-@app.route('/voiceChat',methods=['GET'])
-def videoChat():
-
-    #check if user is logged in
-    if functions.CheckLogin(flask.request.remote_addr) == False:
-        return flask.redirect('/')
-    username = functions.GetUserNameFromIp(flask.request.remote_addr)
-
-    connectTo = flask.request.args.get('connectTo')
-    return flask.render_template('vc_room.html', connectTo = connectTo, connectFrom = username)
-
 ###########socketio signaling###########
+#section for webRTC signaling
 @socketio.on('connect_rtc')
 def handle_rtc_connect(connectFrom,connectTo):
     global room_no_rtc
@@ -104,7 +101,25 @@ def handle_answer(data,connectTo):
 @socketio.on('candidate')
 def handle_candidate(data,connectTo):
     emit('candidate_data', data, room=rooms_for_rtc[connectTo])
+###########socketio signaling end####################
     
+###########show voice chat page###################
+@app.route('/voiceChat',methods=['GET'])
+def videoChat():
+
+    #check if user is logged in
+    if functions.CheckLogin(flask.request.remote_addr) == False:
+        return flask.redirect('/')
+    
+    #get username and friend name you wanna to connect
+    username = functions.GetUserNameFromIp(flask.request.remote_addr)
+    connectTo = flask.request.args.get('connectTo')
+
+    #check if user and connectTo is friend
+    if functions.check_friend(username,connectTo) == False:
+        return flask.redirect('/')
+
+    return flask.render_template('vc_room.html', connectTo = connectTo, connectFrom = username)
 
 ###########show signin page##############
 @app.route('/',methods =['GET','POST'])
@@ -133,13 +148,17 @@ def signup():
     if flask.request.method == "POST":
         username = flask.request.form['username']
         password = flask.request.form['password']
+        #パスワードをハッシュ化して安全性を向上
         password = functions.hash_pass(password)
         stmt = 'SELECT EXISTS(SELECT * FROM users WHERE name = %s)'
         param = (username,)
+        #すでにユーザ名が登録済みか確認
         if DBconntctor.Select_from_DB(stmt,param)[0][0]==1:
             return flask.render_template('signup.html',props = "Username already exists")
+        #ユーザをデータベースに登録
         stmt = 'INSERT INTO users (name,passWord) VALUE ("{}","{}")'.format(username,password)
         DBconntctor.Insert_to_DB(stmt)
+        #ユーザ情報をデータベースに登録
         stmt = 'INSERT INTO user_info (userId) VALUE ("{}")'.format(username)
         DBconntctor.Insert_to_DB(stmt)
         return flask.redirect('/')
@@ -185,7 +204,6 @@ def get_msg():
     if functions.CheckLogin(flask.request.remote_addr) == False:
         return flask.redirect('/')
     username = functions.GetUserNameFromIp(flask.request.remote_addr)
-
 
     #if user is sending message
     if flask.request.method == "POST":
@@ -482,4 +500,5 @@ def friend_reject():
 
 
 if __name__ == '__main__':
-    socketio.run(app,debug=True,host='192.168.0.50',port = 5000)
+    socketio.run(app,debug=True,host='192.168.0.50',port=443,ssl_context=context)
+    # socketio.run(app,debug=True,host='192.168.0.50',port=80)

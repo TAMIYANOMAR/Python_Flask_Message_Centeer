@@ -33,6 +33,7 @@
                     {% for request in friendrequests %}
                     <tr>
                         <div class="friend-request-container">
+                            <img class="img" src="{{ url_for('static', filename= 'image/' + request[1] + '.jpg') }}" alt="Uploaded Image">
                             <h2 class="friend-request-h2">{{request[1]}}</h2>
                             <form class="friend-request-form" action="/friend/approve" method="get">
                                 <input type="hidden" name="requestedid" value="{{request[2]}}">
