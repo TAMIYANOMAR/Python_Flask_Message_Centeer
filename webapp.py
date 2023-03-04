@@ -101,6 +101,10 @@ def handle_answer(data,connectTo):
 @socketio.on('candidate')
 def handle_candidate(data,connectTo):
     emit('candidate_data', data, room=rooms_for_rtc[connectTo])
+
+@socketio.on('share_screen')
+def handle_share_screen(connectTo):
+    emit('share_screen',room=room_no_rtc[connectTo])
 ###########socketio signaling end####################
     
 ###########show voice chat page###################

@@ -1,6 +1,10 @@
 $(document).ready(function() {
     const socket = io();
 
+    const shareScreenButton = document.getElementById('share-screen-btn');
+
+    var count = 0;
+
     // ローカルストリームを表示するvideo要素を取得する
     const localVideo = document.getElementById('local-video');
 
@@ -12,9 +16,12 @@ $(document).ready(function() {
     const connectFrom = document.getElementById('connectFrom');
     console.log(connectFrom)
 
-    var offer_recieved = false;
+    const moteVideo = document.getElementById('share-screen-video')
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+
+    var should_offer = true;
+
+    navigator.mediaDevices.getUserMedia({ video: { frameRate: { max: 15 } }, audio: false })
         .then((stream) => {
             // ローカルストリームを表示するvideo要素にストリームを割り当てる
             localVideo.srcObject = stream;
@@ -22,11 +29,11 @@ $(document).ready(function() {
         .catch((error) => {
             console.error('Failed to get user media', error);
         });
-
+    
     // getUserMediaメソッドを使用して、ローカルストリームを取得する
-    navigator.mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true } })
+    navigator.mediaDevices.getUserMedia({ video: { frameRate: { max: 15 } }, audio: { echoCancellation: true } })
         .then((stream) => {
-
+            
             // Peer Connectionを作成する
             const pc = new RTCPeerConnection();
 
@@ -37,19 +44,32 @@ $(document).ready(function() {
 
             // リモートストリームを受信した場合の処理を定義する
             pc.ontrack = (event) => {
-                // リモートストリームを表示するvideo要素にストリームを割り当てる
-                remoteVideo.srcObject = event.streams[0];
+                if(event.streams && event.streams[0])
+                {
+                    // リモートストリームを表示するvideo要素にストリームを割り当てる
+                    remoteVideo.srcObject = event.streams[0];
+                    if(event.streams.length == 2)moteVideo.srcObject = event.streams[1];
+                    console.log(event.streams);
+                    console.log('on track');
+                    count += 1;
+                }
+                else
+                {
+                    let inbound_stream = new MediaStream(event.track)
+                    moteVideo.srcObject = inbound_stream;
+                    console.log(event.streams);
+                }
+                
             };
 
             // シグナリングサーバーと接続する
             socket.emit('connect_rtc', connectFrom.value, connectTo.value);
             console.log(connectFrom.value,connectTo.value);
             const offer = function(){
-                if(offer_recieved == true)
+                if(should_offer == false)
                 {
                     return;
                 }
-                // Offerを作成し、シグナリングサーバーに送信する
                 pc.createOffer()
                     .then((offer) => {
                         return pc.setLocalDescription(offer);
@@ -57,6 +77,10 @@ $(document).ready(function() {
                     .then(() => {
                         console.log('offer sent')
                         socket.emit('offer', { sdp: pc.localDescription }, connectTo.value);
+                        if(count >= 2 )
+                        {
+                            should_offer = false;
+                        }
                     })
                     .catch((error) => {
                         console.error('Failed to create offer', error);
@@ -79,7 +103,6 @@ $(document).ready(function() {
                     .then(() => {
                         socket.emit('answer', { sdp: pc.localDescription }, connectTo.value);
                         console.log('answer sent');
-                        offer_recieved = true;
                     })
                     .catch((error) => {
                         console.error('Failed to create answer', error);
@@ -93,19 +116,36 @@ $(document).ready(function() {
                     .catch((error) => {
                         console.error('Failed to set remote description', error);
                     });
+                console.log('answer recieved');
             });
 
             // シグナリングサーバーからCandidateが送信された場合の処理を定義する
             socket.on('candidate_data', (data) => {
                 // ICE Candidateを追加する
-                offer_recieved = true;
                 pc.addIceCandidate(new RTCIceCandidate(data.candidate))
                     .catch((error) => {
                         console.error('Failed to add ICE candidate', error);
+                    });
+            });
+
+            shareScreenButton.addEventListener('click', () => {
+                navigator.mediaDevices.getDisplayMedia({ video: {frameRate: {ideal: 30}} })
+                    .then((stream2) => {
+                        // ローカルストリームをPeer Connectionに追加する
+                        stream2.getTracks().forEach((track) => {
+                            pc.addTrack(track,stream,stream2);
+                        });
+                        moteVideo.srcObject = stream2;
+                        console.log('add track stream');
+                        should_offer = true;
+                    })
+                    .catch((error) => {
+                        console.error('Failed to get display media', error);
                     });
             });
         })
         .catch((error) => {
             console.error('Failed to get user media', error);
         });
+    
 });
