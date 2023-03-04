@@ -1,7 +1,7 @@
 Dockerfile
 DBconnctor.py
 ./static/image
-.jpg
+*.jpg
 certificate
 .pem
 static/image
