@@ -3,5 +3,5 @@ DBconnctor.py
 ./static/image
 *.jpg
 certificate
-.pem
+*.pem
 static/image
