@@ -1,27 +1,19 @@
 $(document).ready(function() {
     const socket = io();
-
     const shareScreenButton = document.getElementById('share-screen-btn');
+    const localVideo = document.getElementById('local-video');
+    const remoteVideo = document.getElementById('remote-video');
+    const moteVideo = document.getElementById('share-screen-video')
+    const connectTo = document.getElementById('connectTo');
+    const connectFrom = document.getElementById('connectFrom');
+
+    const video_constraint = {frameRate: {max: 15 }};
+    const screen_constraint = {frameRate: {ideal: 30}};
 
     var count = 0;
-
-    // ローカルストリームを表示するvideo要素を取得する
-    const localVideo = document.getElementById('local-video');
-
-    // リモートストリームを表示するvideo要素を取得する
-    const remoteVideo = document.getElementById('remote-video');
-
-    const connectTo = document.getElementById('connectTo');
-    console.log(connectTo)
-    const connectFrom = document.getElementById('connectFrom');
-    console.log(connectFrom)
-
-    const moteVideo = document.getElementById('share-screen-video')
-
-
     var should_offer = true;
 
-    navigator.mediaDevices.getUserMedia({ video: { frameRate: { max: 15 } }, audio: false })
+    navigator.mediaDevices.getUserMedia({ video: video_constraint, audio: false })
         .then((stream) => {
             // ローカルストリームを表示するvideo要素にストリームを割り当てる
             localVideo.srcObject = stream;
@@ -31,7 +23,7 @@ $(document).ready(function() {
         });
     
     // getUserMediaメソッドを使用して、ローカルストリームを取得する
-    navigator.mediaDevices.getUserMedia({ video: { frameRate: { max: 15 } }, audio: { echoCancellation: true } })
+    navigator.mediaDevices.getUserMedia({ video: video_constraint, audio: { echoCancellation: true } })
         .then((stream) => {
             
             // Peer Connectionを作成する
@@ -64,7 +56,7 @@ $(document).ready(function() {
 
             // シグナリングサーバーと接続する
             socket.emit('connect_rtc', connectFrom.value, connectTo.value);
-            console.log(connectFrom.value,connectTo.value);
+
             const offer = function(){
                 if(should_offer == false)
                 {
@@ -129,7 +121,7 @@ $(document).ready(function() {
             });
 
             shareScreenButton.addEventListener('click', () => {
-                navigator.mediaDevices.getDisplayMedia({ video: {frameRate: {ideal: 30}} })
+                navigator.mediaDevices.getDisplayMedia({ video: screen_constraint })
                     .then((stream2) => {
                         // ローカルストリームをPeer Connectionに追加する
                         stream2.getTracks().forEach((track) => {
