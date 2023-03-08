@@ -268,7 +268,7 @@ video {
   margin-top: 20px;
   margin-bottom: 10px;
   background-color: #5d627b;
-  display: flex;
+  display: none;
 }
 
 .btn-screen-share{

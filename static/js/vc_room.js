@@ -3,7 +3,7 @@ $(document).ready(function() {
     const shareScreenButton = document.getElementById('share-screen-btn');
     const localVideo = document.getElementById('local-video');
     const remoteVideo = document.getElementById('remote-video');
-    const moteVideo = document.getElementById('share-screen-video')
+    const shareScreenVideo = document.getElementById('share-screen-video')
     const connectTo = document.getElementById('connectTo');
     const connectFrom = document.getElementById('connectFrom');
 
@@ -40,7 +40,10 @@ $(document).ready(function() {
                 {
                     // リモートストリームを表示するvideo要素にストリームを割り当てる
                     remoteVideo.srcObject = event.streams[0];
-                    if(event.streams.length == 2)moteVideo.srcObject = event.streams[1];
+                    if(event.streams.length == 2){
+                        shareScreenVideo.srcObject = event.streams[1];
+                        shareScreenVideo.style.display = 'flex';
+                    }
                     console.log(event.streams);
                     console.log('on track');
                     count_on_track += 1;
@@ -48,7 +51,7 @@ $(document).ready(function() {
                 else
                 {
                     let inbound_stream = new MediaStream(event.track)
-                    moteVideo.srcObject = inbound_stream;
+                    shareScreenVideo.srcObject = inbound_stream;
                     console.log(event.streams);
                 } 
             };
@@ -126,8 +129,9 @@ $(document).ready(function() {
                         stream2.getTracks().forEach((track) => {
                             peer_connection.addTrack(track,stream,stream2);
                         });
-                        moteVideo.srcObject = stream2;
+                        shareScreenVideo.srcObject = stream2;
                         console.log('add track stream');
+                        shareScreenVideo.style.display = 'flex';
                         should_offer = true;
                     })
                     .catch((error) => {

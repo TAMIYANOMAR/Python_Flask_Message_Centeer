@@ -7,6 +7,7 @@ import DBconntctor
 import functions
 import os
 import ssl
+from waitress import serve  # Waitressをインポート
 
 #テキストチャットの通知に使うルーム（キーがユーザーネームで値がルーム番号）
 rooms = dict()
@@ -514,4 +515,5 @@ def friend_reject():
 
 
 if __name__ == '__main__':
-    socketio.run(app,debug=True,host='192.168.0.50',port=443,ssl_context=context)
+    socketio.run(app,debug=False,host='192.168.0.50',port=443,ssl_context=context)  
+    # serve(app,socketio,debug = True,host='192.168.0.50',post=443,ssl_context = context)
