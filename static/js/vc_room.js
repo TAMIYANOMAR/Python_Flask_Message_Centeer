@@ -10,9 +10,10 @@ $(document).ready(function() {
     const video_constraint = {frameRate: {max: 15 }};
     const screen_constraint = {frameRate: {ideal: 30}};
 
-    var count = 0;
+    var count_on_track = 0;
     var should_offer = true;
 
+    //ローカルストリーム用
     navigator.mediaDevices.getUserMedia({ video: video_constraint, audio: false })
         .then((stream) => {
             // ローカルストリームを表示するvideo要素にストリームを割り当てる
@@ -21,21 +22,20 @@ $(document).ready(function() {
         .catch((error) => {
             console.error('Failed to get user media', error);
         });
-    
-    // getUserMediaメソッドを使用して、ローカルストリームを取得する
+
+    //リモートストリーム用
     navigator.mediaDevices.getUserMedia({ video: video_constraint, audio: { echoCancellation: true } })
         .then((stream) => {
             
             // Peer Connectionを作成する
-            const pc = new RTCPeerConnection();
+            const peer_connection = new RTCPeerConnection();
 
             // ローカルストリームをPeer Connectionに追加する
             stream.getTracks().forEach((track) => {
-                pc.addTrack(track, stream);
+                peer_connection.addTrack(track, stream);
             });
-
             // リモートストリームを受信した場合の処理を定義する
-            pc.ontrack = (event) => {
+            peer_connection.ontrack = (event) => {
                 if(event.streams && event.streams[0])
                 {
                     // リモートストリームを表示するvideo要素にストリームを割り当てる
@@ -43,15 +43,14 @@ $(document).ready(function() {
                     if(event.streams.length == 2)moteVideo.srcObject = event.streams[1];
                     console.log(event.streams);
                     console.log('on track');
-                    count += 1;
+                    count_on_track += 1;
                 }
                 else
                 {
                     let inbound_stream = new MediaStream(event.track)
                     moteVideo.srcObject = inbound_stream;
                     console.log(event.streams);
-                }
-                
+                } 
             };
 
             // シグナリングサーバーと接続する
@@ -62,14 +61,14 @@ $(document).ready(function() {
                 {
                     return;
                 }
-                pc.createOffer()
+                peer_connection.createOffer()
                     .then((offer) => {
-                        return pc.setLocalDescription(offer);
+                        return peer_connection.setLocalDescription(offer);
                     })
                     .then(() => {
                         console.log('offer sent')
-                        socket.emit('offer', { sdp: pc.localDescription }, connectTo.value);
-                        if(count >= 2 )
+                        socket.emit('offer', { sdp: peer_connection.localDescription }, connectTo.value);
+                        if(count_on_track >= 2 )
                         {
                             should_offer = false;
                         }
@@ -84,16 +83,16 @@ $(document).ready(function() {
             // シグナリングサーバーからOfferが送信された場合の処理を定義する
             socket.on('offer_data', (data) => {
                 // Remote Descriptionを作成し、Peer Connectionに設定する
-                pc.setRemoteDescription(new RTCSessionDescription(data.sdp))
+                peer_connection.setRemoteDescription(new RTCSessionDescription(data.sdp))
                     .then(() => {
                         // Answerを作成し、シグナリングサーバーに送信する
-                        return pc.createAnswer();
+                        return peer_connection.createAnswer();
                     })
                     .then((answer) => {
-                        return pc.setLocalDescription(answer);
+                        return peer_connection.setLocalDescription(answer);
                     })
                     .then(() => {
-                        socket.emit('answer', { sdp: pc.localDescription }, connectTo.value);
+                        socket.emit('answer', { sdp: peer_connection.localDescription }, connectTo.value);
                         console.log('answer sent');
                     })
                     .catch((error) => {
@@ -104,7 +103,7 @@ $(document).ready(function() {
             // シグナリングサーバーからAnswerが送信された場合の処理を定義する
             socket.on('answer_data', (data) => {
                 // Remote Descriptionを設定する
-                pc.setRemoteDescription(new RTCSessionDescription(data.sdp))
+                peer_connection.setRemoteDescription(new RTCSessionDescription(data.sdp))
                     .catch((error) => {
                         console.error('Failed to set remote description', error);
                     });
@@ -114,7 +113,7 @@ $(document).ready(function() {
             // シグナリングサーバーからCandidateが送信された場合の処理を定義する
             socket.on('candidate_data', (data) => {
                 // ICE Candidateを追加する
-                pc.addIceCandidate(new RTCIceCandidate(data.candidate))
+                peer_connection.addIceCandidate(new RTCIceCandidate(data.candidate))
                     .catch((error) => {
                         console.error('Failed to add ICE candidate', error);
                     });
@@ -125,7 +124,7 @@ $(document).ready(function() {
                     .then((stream2) => {
                         // ローカルストリームをPeer Connectionに追加する
                         stream2.getTracks().forEach((track) => {
-                            pc.addTrack(track,stream,stream2);
+                            peer_connection.addTrack(track,stream,stream2);
                         });
                         moteVideo.srcObject = stream2;
                         console.log('add track stream');

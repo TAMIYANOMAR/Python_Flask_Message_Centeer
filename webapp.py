@@ -106,7 +106,8 @@ def handle_candidate(data,connectTo):
 def handle_share_screen(connectTo):
     emit('share_screen',room=room_no_rtc[connectTo])
 ###########socketio signaling end####################
-    
+
+
 ###########show voice chat page###################
 @app.route('/voiceChat',methods=['GET'])
 def videoChat():
@@ -215,6 +216,7 @@ def get_msg():
         postTo = flask.request.form["postTo"]
         postFrom = postTo
 
+        #フレンドかどうかの判定
         if(functions.check_friend(username,postTo) == False):
             return flask.redirect('/message/home')
 
@@ -237,6 +239,7 @@ def get_msg():
         postTo = flask.request.args.get("postFrom")
         postFrom = postTo
 
+        #フレンドかどうかの判定
         if(functions.check_friend(username,postTo) == False):
             return flask.redirect('/message/home')
 
@@ -310,7 +313,14 @@ def show_group():
     param = (groupid,)
     users = DBconntctor.Select_from_DB(stmt,param)
 
-    return flask.render_template('group_show.html',props = "グループ作成", groupname = groupname,users = users,groupid = groupid,MessageContents = messages, username = username)
+    #ユーザが実際にグループに属しているかの判定
+    print(users)
+    for user in users:
+        if user[2] == username:
+            return flask.render_template('group_show.html',props = "グループ", groupname = groupname,users = users,groupid = groupid,MessageContents = messages, username = username)
+    
+    return flask.redirect('/group')
+    
 
 
 ###########route for sending message to group##############
@@ -505,4 +515,3 @@ def friend_reject():
 
 if __name__ == '__main__':
     socketio.run(app,debug=True,host='192.168.0.50',port=443,ssl_context=context)
-    # socketio.run(app,debug=True,host='192.168.0.50',port=80)

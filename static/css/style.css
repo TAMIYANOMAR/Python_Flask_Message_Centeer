@@ -259,14 +259,27 @@ video {
 
 .share-screen-container{
   flex-wrap: wrap;
-  padding-left: 15px;
+  margin: auto;
   width: 98%;
-  height: 600px;
 }
 
 #share-screen-video{
   width:100%;
   margin-top: 20px;
   margin-bottom: 10px;
+  background-color: #5d627b;
   display: flex;
+}
+
+.btn-screen-share{
+  padding: 4px 6px;
+  font-size:20px;
+  opacity: 0.8;
+  border-radius: 4px;
+  background-color: rgb(121, 121, 121);
+  color:#FFF
+}
+
+.btn-screen-share:hover{
+  opacity: 1.0;
 }

@@ -3,9 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import DBconntctor
 import time
 
-
 Login_users = {"exampleip":"exampleuser"}
-
 
 #現在の時間を取得して返す
 def GetTime():
