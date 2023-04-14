@@ -7,7 +7,7 @@
 - Dockerで動かすことができるのはかなり前のものになります。
 # Updates
 
-- 2023/02/27 webRTCを用いた1対1のビデオチャット機能を追加
+- 2023/02/27 webRTCを用いた1対1のビデオチャット機能を追加、画面共有も可能
 - ![image](https://user-images.githubusercontent.com/59043309/231927685-260c2488-5241-4214-8f87-703f48927efa.png)
 - 2023/02/21 socket通信を用いてメッセージ受信時に自動更新を行う機能を追加
 - https://user-images.githubusercontent.com/59043309/220309331-b5537c49-0dc6-4006-b474-28e772fac62b.mp4
