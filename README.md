@@ -1,4 +1,4 @@
-# MessagingCenteer
+# Messaging Centeer
 - This is web application with python Flask and mysql.
 - Please install Flask and mysql-connector
 - With Mysql on Docker can easily use this application
